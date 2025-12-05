@@ -1,0 +1,33 @@
+import express from 'express';
+import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import morgan from 'morgan';
+import cors from 'cors';
+import connectDb from './database/database.js';
+import authRoutes from './routes/authRoutes.js'
+
+dotenv.config();
+const app = express();
+
+app.use(cookieParser());
+app.use(express.json());
+app.use(morgan('dev'));
+app.use(cors({
+    origin : process.env.FRONTEND_URL  || 'http://localhost:5173',
+    methods: ['GET' , 'POST' , 'PUT' , 'DELETE'],
+    allowedHeaders: ['Content-Type'],
+    credentials: true
+}))
+
+const PORT = process.env.PORT || 5000;
+
+//establish connection
+const db = await connectDb();
+app.locals.db = db;
+
+app.get('/' , (req , res) => {
+    res.json({msg : "opening website"})
+})
+
+app.use('/api' ,  authRoutes);
+app.listen(PORT , "0.0.0.0" , () => console.log(`APP is listening at PORT ${PORT}`));

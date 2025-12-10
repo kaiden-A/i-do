@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 import connectDb from './database/database.js';
 import authRoutes from './routes/authRoutes.js'
+import errorHandler from './middleware/errorHandler.js';
 
 dotenv.config();
 const app = express();
@@ -30,4 +31,6 @@ app.get('/' , (req , res) => {
 })
 
 app.use('/api' ,  authRoutes);
+app.use(errorHandler);
+
 app.listen(PORT , "0.0.0.0" , () => console.log(`APP is listening at PORT ${PORT}`));

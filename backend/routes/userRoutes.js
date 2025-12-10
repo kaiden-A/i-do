@@ -1,9 +1,18 @@
 import { Router } from "express";
-import { create_group } from "../controller/userController";
+import { 
+    add_task,
+    create_group, 
+    get_dashboard, 
+    get_task 
+} from "../controller/userController.js";
 
 
 const router = Router();
 
+router.get('/tasks' , get_task);
+router.post('/tasks/:groupId' , add_task);
+
+router.get('/groups' , get_dashboard);
 router.post('/groups' , create_group);
 
 export default router;

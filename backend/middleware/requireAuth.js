@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-
+import AppError from '../utils/AppError.js';
 
 export default async function requireAuth(req , res , next){
 
@@ -11,7 +11,7 @@ export default async function requireAuth(req , res , next){
         const decodedToken = jwt.verify(token , process.env.JWT_SECRET);
 
         if(!decodedToken){
-            return res.status(404).json({error : true , cookies : false})
+            return next(new AppError('Authentication token missing' , 401))
         }
 
         const [rows]= await db.query(`SELECT user_id , user_name FROM USERS WHERE user_id = ? ` ,
@@ -19,7 +19,7 @@ export default async function requireAuth(req , res , next){
         )
 
         if(rows.length === 0){
-            return res.status(401).json({error : true , msg : 'user not found'})
+            return next(new AppError("User Not Found" , 401))
         }
 
         req.user = rows[0];
@@ -27,7 +27,6 @@ export default async function requireAuth(req , res , next){
 
     }catch(err){
         
-        console.log(err);
-        res.json({error : true , cookies : false})
+        return next(new AppError('Invalid or expired token' , 401))
     }
 }

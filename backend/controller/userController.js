@@ -1,5 +1,6 @@
 import AppError from "../utils/AppError.js";
 import catchAsync from "../utils/catchAsync.js";
+import crypto from 'crypto';
 
 export const get_dashboard = catchAsync(async (req , res) => {
 
@@ -215,4 +216,31 @@ export const update_task = catchAsync( async(req , res) => {
     }
 
     res.status(201).json({success : true , message : 'successfully change the status'})
+})
+
+export const create_invite = catchAsync( async(req , res) => {
+
+    const db = req.app.locals.db;
+
+    const { groupId } = req.body;
+
+    const inviteToken = crypto.randomBytes(32).toString("hex"); 
+    const expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); 
+
+    const [result] = await db.query(
+        `
+        INSERT INTO INVITES (group_id , invite_token , expires_at)
+        VALUES(? , ? , ?)
+        `,
+        [groupId , inviteToken , expiresAt]
+    )
+
+    if(result.affectedRows === 0){
+        throw new AppError('Fail Creating invites Link' , 400)
+    }
+
+    const joinLink = `${process.env.FRONTEND_URL}/join/${groupId}/${inviteToken}`;
+
+    res.status(201).json({success : true , inviteLink : joinLink})
+
 })

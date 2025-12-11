@@ -1,6 +1,7 @@
 import {BrowserRouter , Link , Routes , Route} from 'react-router-dom';
 import UserPage from './pages/UserPage/UserPage';
 import Dashboard from './pages/UserPage/Dashboard/Dashboard';
+import SignPage from './pages/SignPage/SignPage';
 
 function App() {
 
@@ -8,6 +9,10 @@ function App() {
     <BrowserRouter>
 
       <Routes>
+
+          <Route path='/login' element={<SignPage login={true}/>}/>
+          <Route path='/signup' element={<SignPage login={false}/>}/>
+
 
           <Route path='/' element={<UserPage/>}>
             <Route path='dashboard' element={<Dashboard/>} />

@@ -3,6 +3,7 @@ import {
     add_notes,
     add_task,
     create_group, 
+    create_invite, 
     get_dashboard, 
     get_notes, 
     get_task, 
@@ -21,5 +22,7 @@ router.post('/groups' , create_group);
 
 router.get('/notes' , get_notes);
 router.post('/notes/:groupId' , add_notes );
+
+router.post('/invite/create' , create_invite)
 
 export default router;

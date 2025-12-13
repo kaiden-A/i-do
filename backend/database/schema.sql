@@ -41,5 +41,14 @@ CREATE TABLE NOTES(
     CONSTRAINT notes_group_id_fk FOREIGN KEY(group_id) REFERENCES GROUP_TASK(group_id) ON DELETE CASCADE
 );
 
+CREATE TABLE INVITES(
+	invite_id INTEGER,
+    group_id INTEGER,
+    invite_token VARCHAR(100),
+    expires_at date,
+    CONSTRAINT invites_invite_id_pk PRIMARY KEY(invite_id),
+    CONSTRAINT invites_group_id FOREIGN KEY(group_id) REFERENCES GROUP_TASK(group_id)
+);
+
 
 

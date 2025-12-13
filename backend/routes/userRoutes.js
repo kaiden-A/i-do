@@ -7,6 +7,7 @@ import {
     get_dashboard, 
     get_notes, 
     get_task, 
+    join_invite, 
     update_task
 } from "../controller/userController.js";
 
@@ -23,6 +24,7 @@ router.post('/groups' , create_group);
 router.get('/notes' , get_notes);
 router.post('/notes/:groupId' , add_notes );
 
-router.post('/invite/create' , create_invite)
+router.post('/invite/create' , create_invite);
+router.post('/invite/join' , join_invite);
 
 export default router;

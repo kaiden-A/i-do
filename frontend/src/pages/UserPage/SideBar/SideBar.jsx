@@ -40,9 +40,11 @@ function SideBar(){
                     </Link>
                 </li>
                 <li>
-                    <a href="#">
-                        <i className="fas fa-calendar-alt"></i>Study Schedule
-                    </a>
+                    <Link to={'/notes'}
+                        className={`${location.pathname === '/notes' ? 'active' : ''}`}
+                    >
+                        <i className="fas fa-sticky-note"></i>Notes
+                    </Link>
                 </li>
                 <li>
                     <a href="#"><i className="fas fa-chart-line"></i>Progress
@@ -53,10 +55,8 @@ function SideBar(){
             </ul>
             
             <div className="user-profile">
-                <div className="user-avatar">AS</div>
                 <div className="user-info">
-                    <h4>Alex Smith</h4>
-                    <p>Computer Science</p>
+                    <p>Made and develop by Kaiden-A</p>
                 </div>
             </div>
         </aside>

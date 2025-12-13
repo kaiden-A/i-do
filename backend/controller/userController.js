@@ -25,7 +25,6 @@ export const get_dashboard = catchAsync(async (req , res) => {
         LEFT JOIN TASK t ON g.group_id = t.group_id     
         WHERE u.user_id = ?
         GROUP BY u.user_name, g.group_name;
-
         `,
         [user.user_id]
     )
@@ -224,7 +223,7 @@ export const create_invite = catchAsync( async(req , res) => {
 
     const { groupId } = req.body;
 
-    const inviteToken = crypto.randomBytes(32).toString("hex"); 
+    const inviteToken = crypto.randomBytes(10).toString("hex"); 
     const expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); 
 
     const [result] = await db.query(
@@ -243,4 +242,8 @@ export const create_invite = catchAsync( async(req , res) => {
 
     res.status(201).json({success : true , inviteLink : joinLink})
 
+})
+
+export const join_invite = catchAsync( async(req , res) => {
+    
 })

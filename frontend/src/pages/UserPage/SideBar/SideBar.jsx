@@ -46,11 +46,6 @@ function SideBar(){
                         <i className="fas fa-sticky-note"></i>Notes
                     </Link>
                 </li>
-                <li>
-                    <a href="#"><i className="fas fa-chart-line"></i>Progress
-                    </a>
-                </li>
-                <li><a href="#"><i className="fas fa-book"></i>Resources</a></li>
                 <li><a href="#"><i className="fas fa-cog"></i>Settings</a></li>
             </ul>
             

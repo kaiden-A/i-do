@@ -246,4 +246,36 @@ export const create_invite = catchAsync( async(req , res) => {
 
 export const join_invite = catchAsync( async(req , res) => {
     
+    const user = req.user;
+    const db = req.app.locals.db;
+
+    const {groupId , tokenId} = req.body;
+
+    const [rowsAdmin] = await db.query(
+        `
+        SELECT
+            group_admin AS groupAdmin  
+        FROM GROUP_TASK 
+        WHERE group_admin = ? AND group_id = ?
+        `,
+        [user.user_id , groupId]
+    )
+
+    if(rowsAdmin[0].groupAdmin === user.user_id){
+        return res.status(200).json({success : true , message : "User is an admin", redirectedTo : '/dashboard'});
+    }
+
+    const [result] = await db.query(
+        `
+            INSERT INTO MEMBERS(group_id , user_id , joined_at)
+            VALUES(? , ? , ?)
+        `,
+        [groupId , user.user_id , new Date()]
+    )
+
+    if(result.affectedRows === 0){
+        throw new AppError("User Doesnt Exist" , 401);
+    }
+
+    res.status(201).json({success : true , message : "successfully add new members"})
 })

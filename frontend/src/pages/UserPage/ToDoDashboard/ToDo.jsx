@@ -1,4 +1,5 @@
 import Header from "./components/Header";
+import SearchBar from "./components/Search";
 import ToDoCard from "./components/ToDoCard";
 import "./styles/ToDo.css"
 
@@ -10,15 +11,7 @@ function ToDo(){
             <div className="mother">
                 <Header/>
 
-                <div className="search-filter">
-                    <form>
-                        <input 
-                            type="text"
-                            placeholder="Search for a group..."
-                        />
-                    </form>
-                    <button className="btn btn-primary">SEARCH</button>
-                </div>
+                <SearchBar/>
 
                 <section className="task-board-section">
                     <ToDoCard/>

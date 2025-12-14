@@ -1,0 +1,6 @@
+@media (max-width: 768px){
+    .title-box{
+        display: flex;
+        flex-direction: column;
+    }
+}

@@ -13,18 +13,16 @@ export const get_dashboard = catchAsync(async (req , res) => {
             u.user_name AS userName,
             g.group_name AS groupName,
             COUNT(t.title) AS totalTask,
-            COALESCE(
-                ROUND(
-                    (SUM(CASE WHEN t.status = 'Finish' THEN 1 ELSE 0 END) /
-                    NULLIF(COUNT(t.title), 0)) * 100,
-                2),
-            0) AS totalComplete
+            COALESCE(ROUND(
+                (SUM(CASE WHEN t.status = 'Finish' THEN 1 ELSE 0 END) / NULLIF(COUNT(t.title), 0)) * 100
+            , 2), 0) AS totalComplete,
+            (SELECT COUNT(*) FROM MEMBERS m2 WHERE m2.group_id = g.group_id) AS totalMembers
         FROM USERS u
         JOIN MEMBERS m ON u.user_id = m.user_id    
         JOIN GROUP_TASK g ON m.group_id = g.group_id    
         LEFT JOIN TASK t ON g.group_id = t.group_id     
-        WHERE u.user_id = ?
-        GROUP BY u.user_name, g.group_name;
+        WHERE u.user_id = 2
+        GROUP BY u.user_name, g.group_name, g.group_id;
         `,
         [user.user_id]
     )

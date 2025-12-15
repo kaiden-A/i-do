@@ -17,22 +17,22 @@ async function comparePassword(password , hashPass){
     
 }
 
-const maxAge = 3 * 24 * 60 * 60;
-
+const minAge = 3 * 24 * 60 * 60;
+const maxAge = 30 * 24 * 60 * 60;
 function createToken(id){
     return jwt.sign({id : id} , process.env.JWT_SECRET , {expiresIn : maxAge})
 }
 
 export const post_login = catchAsync( async (req , res) => {
 
-    const {userId , password} = req.body;
+    const {email , password , remember} = req.body;
     const db = req.app.locals.db;
 
     
 
     const [rows] = await db.query(
-        'SELECT * FROM USERS WHERE user_id = ?',
-        [userId]
+        'SELECT * FROM USERS WHERE email = ?',
+        [email]
     )
 
     if(rows.length === 0){
@@ -46,11 +46,11 @@ export const post_login = catchAsync( async (req , res) => {
     }
 
 
-    const token = createToken(userId);
+    const token = createToken(rows[0].user_id);
 
     res.cookie('jwt' , token , {   
         httpOnly : true , 
-        maxAge : maxAge * 1000,
+        maxAge : remember ? maxAge * 1000 : minAge * 1000,
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? "none" : "lax"
     } );
@@ -82,7 +82,7 @@ export const post_signup = catchAsync(async (req , res) => {
 
     res.cookie('jwt' , token , {   
         httpOnly : true , 
-        maxAge : maxAge * 1000,
+        maxAge : minAge * 1000,
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? "none" : "lax"
     } );

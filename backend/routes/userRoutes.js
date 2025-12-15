@@ -14,6 +14,10 @@ import {
 
 const router = Router();
 
+router.get('/' , (req , res) => {
+    res.status(200).json({success : true , message : "opening website"})
+})
+
 router.get('/tasks' , get_task);
 router.post('/tasks/:groupId' , add_task);
 router.put('/task/:taskId' , update_task);

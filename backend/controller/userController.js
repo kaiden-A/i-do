@@ -134,20 +134,19 @@ export const get_notes = catchAsync( async(req , res) => {
         SELECT 
             g.group_name AS groupName , 
             n.note_types  AS types, 
-            n.note_details AS details 
+            n.note_details AS details,
+            n.notes_link AS notesLink,
+            u.user_name AS createdBy,
+            DATE_FORMAT(n.created_at, '%d %b %Y') AS createdAt
         FROM NOTES n JOIN GROUP_TASK g ON g.group_id = n.group_id
+        JOIN USERS u ON n.created_by = u.user_id 
         WHERE g.group_id  IN ( SELECT group_id FROM members WHERE user_id = ?);
         `,
         [user.user_id]
     )
 
-    const result = rows.reduce((acc, item) => {
-        if (!acc[item.groupName]) acc[item.groupName] = [];
-        acc[item.groupName].push(item);
-        return acc;
-    }, {});
 
-    res.status(200).json({success : true , notes : result})
+    res.status(200).json({success : true , notes : rows})
 
 } )
 

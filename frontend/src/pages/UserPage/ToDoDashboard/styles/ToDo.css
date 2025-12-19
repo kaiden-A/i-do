@@ -62,6 +62,7 @@
 .task-list {
     min-height: 350px;
     padding: 5px;
+    position: relative;
 }
 
 .task-card {
@@ -175,4 +176,91 @@
   flex: 0 0 auto;   /* 🔴 important */
   width: auto;      /* override global width:100% */
   white-space: nowrap;
+}
+
+
+@media (max-width: 1024px) {
+    .task-board {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .task-list {
+        min-height: 250px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* Task Board */
+    .task-board {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 30px;
+    }
+
+    .task-column {
+        padding: 16px;
+    }
+
+    /* Column Header */
+    .column-header {
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+    }
+
+    .column-title {
+        font-size: 1.1rem;
+    }
+
+    .task-count {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+    }
+
+    /* Task Card */
+    .task-card {
+        padding: 16px;
+        margin-bottom: 14px;
+    }
+
+    .task-title {
+        font-size: 1rem;
+    }
+
+    .task-desc {
+        font-size: 0.85rem;
+    }
+
+    .task-meta {
+        flex-direction: column;
+        gap: 8px;
+        font-size: 0.8rem;
+    }
+
+    /* Assignee */
+    .assignee-avatar {
+        width: 24px;
+        height: 24px;
+        font-size: 0.7rem;
+    }
+
+    /* Search & Filter */
+    .search-filter {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin: 15px 0 20px 0;
+        padding-bottom: 20px;
+    }
+
+    .search-filter form {
+        width: 100%;
+    }
+
+    .search-filter .btn {
+        width: 100%;
+        padding: 12px;
+    }
 }

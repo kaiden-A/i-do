@@ -1,8 +1,39 @@
+import { useEffect, useState } from "react";
+import NotesCard from "./components/NotesCard";
 import Title from "./components/Title";
 import "./styles/Notes.css"
+import axios from "axios";
 
 function Notes(){
-    
+
+    const [notes , setNotes] = useState([]);
+
+    useEffect(() => {
+
+        const fetchNotes = async () => {
+
+            try{
+
+                const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/notes` , 
+                    {withCredentials : true}
+                )
+
+                console.log(res.data);
+
+                setNotes(res.data.notes);
+
+            }catch(err){
+                console.log(err);
+                throw new Error(err);
+            }
+
+        }
+
+        fetchNotes();
+
+    }, [])
+
+
     return(
         <div className="mother">
             <section className="notes-section">
@@ -10,34 +41,48 @@ function Notes(){
                 <Title/>
 
                 <div className="notes-content">
-                    <div className="note-item">
-                        <a href="https://docs.google.com/document/d/example1" target="_blank" className="note-link">
-                            <i className="fas fa-file-alt"></i> React Hooks Study Guide
-                        </a>
-                        <div className="note-date">Added by Alex, Nov 5</div>
-                    </div>
-                    <div className="note-item">
-                        <a href="https://www.figma.com/file/example" target="_blank" className="note-link">
-                            <i className="fab fa-figma"></i> Project Wireframes
-                        </a>
-                        <div className="note-date">Added by Katie, Nov 8</div>
-                    </div>
-                    <div className="note-item">
-                        <div className="note-text">
-                            <i className="fas fa-sticky-note"></i> Meeting notes: We'll use JWT for authentication
-                        </div>
-                        <div className="note-date">Added by Robert, Nov 12</div>
-                    </div>
-                    <div className="note-item">
-                        <a href="https://drive.google.com/drive/example" target="_blank" className="note-link">
-                            <i className="fas fa-database"></i> Database Schema Diagrams
-                        </a>
-                        <div className="note-date">Added by Maria, Nov 14</div>
-                    </div>
+                    {
+                        notes?.length > 0 ? (
+
+                            notes.map((n , i) => 
+                                <NotesCard 
+                                    key={i}
+                                    noteDetails={n.details}
+                                    icon={getIcon(n.types)}
+                                    createdAt={n.createdAt}
+                                    createdBy={n.createdBy}
+                                    haveLink={n.notesLink ? true : false}
+                                    link={n.notesLink}    
+                                />
+                            )
+                        ) : (
+                            <div>
+                                No Notes
+                            </div>
+                        )
+                    }
                 </div>
             </section>
         </div>
     )
+}
+
+function getIcon(type){
+
+    const fileType = {
+        docs: "fa-file-at",
+        reminder: "fa-sticky-note",
+        pdf: "fa-file-pdf",
+        code: "fa-file-code",
+        database: "fa-database",
+        notes: "fa-book-open",
+        assignment: "fa-file-pen",
+        bug: "fa-bug",
+        archive: "fa-file-zipper"
+    };
+
+    return fileType[type] || "fa-file";
+
 }
 
 

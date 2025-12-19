@@ -38,10 +38,7 @@ function Dashboard(){
                     withCredentials : true
                 })
 
-                console.log(res.data)
                 setData(res.data.groupSummary);
-
-
                 if(!res.data.success){
                     throw new Error(res.data.message);
                 }
@@ -56,9 +53,6 @@ function Dashboard(){
 
     }, [])
 
-    useEffect(() => {
-        console.log(data);
-    }, [data])
 
 
     return(

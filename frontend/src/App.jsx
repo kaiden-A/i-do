@@ -4,6 +4,7 @@ import Dashboard from './pages/UserPage/Dashboard/Dashboard';
 import SignPage from './pages/SignPage/SignPage';
 import ToDo from './pages/UserPage/ToDoDashboard/ToDo';
 import Notes from './pages/NoteSection/Notes';
+import DragSnap from './DragSnap';
 
 function App() {
 
@@ -21,6 +22,8 @@ function App() {
             <Route path='studies' element={<ToDo/>} />
             <Route path='notes' element={<Notes/>} />
           </Route>
+
+          <Route path='/test' element={<DragSnap/>} />
 
       </Routes>
     </BrowserRouter>

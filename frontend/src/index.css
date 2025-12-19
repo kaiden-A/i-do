@@ -170,6 +170,8 @@ body {
 
 /* MOBILE RESPONSIVE */
 @media (max-width: 768px) {
+
+
     .sidebar {
         position: fixed;
         left: 0;

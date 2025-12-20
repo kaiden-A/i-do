@@ -1,6 +1,6 @@
 
 
-function GroupCard({name , totalMembers , totalComplete , totalTask}){
+function GroupCard({name , totalMembers , totalComplete , totalTask , desc}){
 
     return(
         <>
@@ -12,13 +12,12 @@ function GroupCard({name , totalMembers , totalComplete , totalTask}){
                         <i className="fas fa-user-graduate"></i> {totalMembers}
                     </div>
                 </div>
-                <p className="group-description">Advanced web development course study group focusing on React, Node.js, and databases.</p>
+                <p className="group-description">{desc}</p>
                 <div className="progress-bar">
                     <div className="progress-fill" style={{width : `${totalComplete}%`}}></div>
                 </div>
                 <div className="group-footer">
                     <span>{`${totalTask} tasks • ${totalComplete}% complete `}</span>
-                    <span>Due: Dec 15</span>
                 </div>
             </div>
             

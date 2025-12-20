@@ -79,6 +79,7 @@ function Dashboard(){
                                         totalMembers={d?.totalMembers}
                                         totalComplete={d?.totalComplete}
                                         totalTask={d?.totalTask}
+                                        desc={d?.groupDesc}
 
                                     />
                                 )

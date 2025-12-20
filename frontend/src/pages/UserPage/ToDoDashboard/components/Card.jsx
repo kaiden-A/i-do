@@ -2,7 +2,6 @@
 
 function Card({status , title , desc , pic , date}){
 
-    const sty = ["prep" , "ongoing" , "completed"];
 
     return(
         <>

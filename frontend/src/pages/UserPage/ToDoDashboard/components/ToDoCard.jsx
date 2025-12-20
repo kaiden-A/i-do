@@ -1,14 +1,14 @@
-import Card from "./Card";
 import Column from "./Column";
 
 
-function ToDoCard(){
+function ToDoCard({title , tasks}){
+
 
     return(
         <div>
             <div className="section-title">
                 <div>
-                    <i className="fas fa-columns"></i> Task Board: Web Development Group
+                    <i className="fas fa-columns"></i> {`Task Board : ${title} `}
                 </div>
                 <div style={{display : 'flex'}}>
                     <button className="btn btn-accent" >
@@ -22,18 +22,9 @@ function ToDoCard(){
             
             <div className="task-board">
                 
-                <Column
-                    status={"prep"}
-                />
-                
-                
-                <Column
-                    status={"ongoing"}
-                />
-                
-                <Column
-                    status={"finish"}
-                />
+                <Column status={"prep"} tasks={tasks} total={tasks.filter(t => t.status === "prep").length} />
+                <Column status={"ongoing"} tasks={tasks} total={tasks.filter(t => t.status === "ongoing").length}/>
+                <Column status={"finish"} tasks={tasks} total={tasks.filter(t => t.status === "finish").length}/>
             </div>
 
             

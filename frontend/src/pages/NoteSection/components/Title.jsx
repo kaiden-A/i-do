@@ -1,21 +1,29 @@
+import { useState } from "react";
 import "../styles/Title.css"
+import CreateNotes from "./CreateNotes";
 
 function Title(){
+    
+    const [note , setNotes] = useState(false);
 
     return(
+        <> 
+            {note && <CreateNotes onClose={() => setNotes(false)}/>}
+            <div style={headerStyle} className="title-box">
+                <h2 style={titleStyle}>
+                    <i className="fas fa-sticky-note"></i>
+                    Study Notes & Resources
+                </h2>
+                <div>
+                    <button style={btnStyle} className="btn btn-success"
+                        onClick={() => setNotes(true)}
+                    >
+                        <i className="fas fa-plus"></i> Add Resource
+                    </button> 
+                </div>
 
-        <div style={headerStyle} className="title-box">
-            <h2 style={titleStyle}>
-                <i className="fas fa-sticky-note"></i>
-                Study Notes & Resources
-            </h2>
-            <div>
-                <button style={btnStyle} className="btn btn-success">
-                    <i className="fas fa-plus"></i> Add Resource
-                </button> 
             </div>
-
-        </div>
+        </>
     )
 }
 

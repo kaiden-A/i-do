@@ -1,6 +1,8 @@
 import Card from "./Card";
 
-function Column({ status , total}){
+function Column({ status , tasks , total = 0}){
+
+    const filteredTasks = tasks.filter(t => t.status === status );
 
     return(
 
@@ -13,13 +15,19 @@ function Column({ status , total}){
                     <div className="task-count">{total}</div>
                 </div>
                 <div className="task-list">
+                    {
+                        filteredTasks.map((t  , i)=> 
+                            <Card
+                                key={i}
+                                status={t?.status}
+                                title={t?.task}
+                                pic={t?.userName}
+                                date={t?.dueDate}
+                                desc={t?.taskDesc}
+                            />
+                        )
+                    }
                     
-                    <Card
-                        status={`prep`}
-                    />
-                    <Card
-                        status={"prep"}
-                    />
                 </div>
             </div>
         </>

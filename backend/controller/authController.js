@@ -69,13 +69,22 @@ export const post_signup = catchAsync(async (req , res) => {
     const hashPass = await hashedPassword(password);
     const createdAt = new Date();
 
+    const [row] = await db.query(
+        'SELECT * FROM USERS WHERE email = ?',
+        [email]
+    );
+
+    if(row.length !== 0){
+        throw new AppError("Email Already Exist" , 400);
+    }
+
     const [result] = await db.query(
-        'INSERT INTO USERS VALUES(? , ? , ? , ? , ?)' , 
+        'INSERT INTO USERS(user_id , user_name , email , hash_password , created_at) VALUES(? , ? , ? , ? , ?)' , 
         [userId , name , email , hashPass , createdAt]
     );
 
     if(result.affectedRows === 0 ){
-        throw new Error("Fail to create User" , 400);
+        throw new AppError("Fail to create User" , 400);
     }
 
     const token = createToken(userId);

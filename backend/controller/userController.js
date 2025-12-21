@@ -1,6 +1,7 @@
 import AppError from "../utils/AppError.js";
 import catchAsync from "../utils/catchAsync.js";
 import crypto from 'crypto';
+import sendEmail from '../utils/sendEmail.js';
 
 export const get_dashboard = catchAsync(async (req , res) => {
 
@@ -41,18 +42,19 @@ export const get_task = catchAsync(async (req , res) => {
     const [rows] = await db.query(
         `
         SELECT 
-            u.user_name AS userName , 
-            g.group_name AS groupName , 
-            t.title  AS task, 
-            t.task_desc AS taskDesc , 
+            u.user_name AS userName, 
+            g.group_name AS groupName, 
+            t.title AS task, 
+            t.task_desc AS taskDesc, 
             t.status AS status, 
-            DATE_FORMAT(t.due_date , '%b %d %Y') AS dueDate
-        FROM USERS u  
-        JOIN  TASK t ON u.user_id = t.user_id
-        JOIN GROUP_TASK g ON t.group_id = g.group_id
-        WHERE g.group_id IN (SELECT group_id FROM MEMBERS WHERE user_id = ?)
+            DATE_FORMAT(t.due_date, '%b %d %Y') AS dueDate
+        FROM USERS u
+        JOIN GROUP_TASK g ON g.group_id IN (SELECT group_id FROM MEMBERS WHERE user_id = ?)
+        LEFT JOIN TASK t ON t.group_id = g.group_id
+        WHERE u.user_id = ?;
+
         `,
-        [user.user_id]
+        [user.user_id , user.user_id]
     );
 
     const result = rows.reduce((acc, item) => {
@@ -73,7 +75,7 @@ export const add_task = catchAsync( async (req , res) => {
 
     const {picId , title , desc , due} = req.body;
 
-    const status = "Prep"
+    const status = "prep"
     const [result] = await db.query(
             `INSERT INTO TASK 
                 ( group_id , created_by , user_id , title , task_desc , status , created_at , due_date)
@@ -96,13 +98,16 @@ export const create_group = catchAsync( async (req , res) => {
 
     const user = req.user;
     const db = req.app.locals.db;
-    const {groupName} = req.body;
+    const {groupName , desc , emails} = req.body;
 
+    let existingUsers = [];
+    let existingEmail = [];
+    let notFoundEmails = [];
     
 
     const [result] = await db.query(
-        'INSERT INTO GROUP_TASK(group_name , group_admin) VALUES(? , ?)',
-        [groupName , user.user_id]
+        'INSERT INTO GROUP_TASK(group_name , group_desc , group_admin) VALUES(? , ? , ?)',
+        [groupName , desc , user.user_id]
     )
 
     if(result.affectedRows === 0){
@@ -119,8 +124,77 @@ export const create_group = catchAsync( async (req , res) => {
     if(resultInsert.affectedRows === 0){
         throw new AppError("Fail Add Admin" , 400);
     }
+    
+    if(emails && emails.length > 0){
 
-    res.status(201).json({success : true , msg : `Successfully create ${groupName}`})
+        const uniqueEmails = [...new Set(emails)].filter(e => e !== user.email);
+        
+        if(uniqueEmails.length > 0){
+            [existingUsers] = await db.query(
+                'SELECT user_id , email FROM USERS WHERE email IN(?)',
+                [uniqueEmails]
+            )
+        }
+
+        existingEmail = existingUsers.map(u => u.email);
+        notFoundEmails = uniqueEmails.filter(emails => !existingEmail.includes(emails));
+
+        if(existingEmail.length > 0){
+            
+            const values = existingUsers.map( u => [u.user_id , groupId , new Date()]);
+
+            await db.query(
+                `INSERT INTO MEMBERS(user_id , group_id , joined_at) 
+                VALUES ?
+                `,
+                [values]
+            );
+
+        }
+
+        const validExistingUsers = existingUsers.filter(u => u.email);  
+        const validNotFoundEmails = notFoundEmails.filter(e => e);
+
+        if (validExistingUsers.length === 0 && validNotFoundEmails.length === 0) {
+            console.log("No valid emails to send invites.");
+        }
+
+        if (validExistingUsers.length > 0) {
+            await Promise.all(validExistingUsers.map(u =>
+                sendEmail({
+                    to: u.email,
+                    subject: `Added to Group ${groupName}`,
+                    text: `You were invited to join ${groupName}. Visit ${process.env.FRONTEND_URL}`
+                })
+            ));
+        }
+
+        if (validNotFoundEmails.length > 0) {
+            await Promise.all(validNotFoundEmails.map(email =>
+                sendEmail({
+                    to: email,
+                    subject: "Group invitation",
+                    text: `You were invited to join "${groupName}". Create an account at "${process.env.FRONTEND_URL}/signup`
+                })
+            ));
+        }
+
+
+    }
+
+    res.status(201).json({
+        success : true , 
+        msg : `Successfully create ${groupName}` , 
+        group : {
+            groupName,
+            groupDesc : desc,
+            totalMembers: 1 + existingUsers.length,
+            totalTask: 0,
+            totalComplete: 0
+        },
+        successInvite : existingEmail , 
+        failInvite : notFoundEmails
+    })
 
     
 })

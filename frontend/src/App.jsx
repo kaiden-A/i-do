@@ -6,6 +6,7 @@ import ToDo from './pages/UserPage/ToDoDashboard/ToDo';
 import Notes from './pages/NoteSection/Notes';
 import DragSnap from './DragSnap';
 import { TaskProvider } from './pages/Context/TaskContext';
+import { DashboardProvider } from './pages/Context/DashboardContext';
 
 function App() {
 
@@ -19,7 +20,11 @@ function App() {
 
 
           <Route path='/' element={<UserPage/>}>
-            <Route path='dashboard' element={<Dashboard/>} />
+            <Route path='dashboard' element={
+              <DashboardProvider>
+                <Dashboard/>
+              </DashboardProvider>
+            } />
             <Route path='studies' element={
               <TaskProvider>
                 <ToDo/>

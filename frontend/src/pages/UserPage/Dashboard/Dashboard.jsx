@@ -5,13 +5,13 @@ import "./styles/Dashboard.css"
 import "./styles/GroupCard.css"
 
 import Notifications from "../../Global/Notifications";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { DashboardContext } from "../../Context/DashboardContext";
 function Dashboard(){
 
     const [noti , setNoti] = useState(false);
-    const [data , setData] = useState([]);
+    const {data , setData} = useContext(DashboardContext);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -27,31 +27,6 @@ function Dashboard(){
 
         return () => clearTimeout(openTimer);
     }, []);
-
-    useEffect(() => {
-
-        const fetchData = async () => {
-
-            try{
-
-                const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/groups` , {
-                    withCredentials : true
-                })
-
-                setData(res.data.groupSummary);
-                if(!res.data.success){
-                    throw new Error(res.data.message);
-                }
-
-            }catch(err){
-
-            }
-
-        }
-
-        fetchData();
-
-    }, [])
 
 
 

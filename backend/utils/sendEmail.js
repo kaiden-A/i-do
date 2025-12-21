@@ -1,34 +1,34 @@
-// Import the Nodemailer library
-import nodemailer  from 'nodemailer';
-// Create a transporter object
-function sendEmail(to , subject , text){
+import nodemailer from 'nodemailer';
+
+async function sendEmail({ to, subject, text }) {
+    if (!to || (Array.isArray(to) && to.length === 0) || to.trim?.() === '') {
+        console.log('No recipient provided. Skipping email.');
+        return;
+    }
 
     const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 587,
-        secure: false, // use false for STARTTLS; true for SSL on port 465
+        secure: false,
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS,
-        }
+        },
     });
 
-    // Configure the mailoptions object
     const mailOptions = {
         from: process.env.EMAIL_USER,
-        to: to,
-        subject: subject,
-        text: text
+        to: to, // string or array
+        subject,
+        text,
     };
 
-    // Send the email
-    transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-            console.log('Error:', error);
-        } else {
-            console.log('Email sent: ', info.response);
-        }
-    });
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Email sent:', info.response);
+    } catch (error) {
+        console.error('Error sending email:', error);
+    }
 }
 
 export default sendEmail;

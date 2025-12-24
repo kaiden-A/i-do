@@ -17,6 +17,7 @@ export function TaskProvider({children}){
                     {withCredentials : true}
                 )
 
+                console.log(res.data);
                 setData(res.data);
 
             }catch(err){

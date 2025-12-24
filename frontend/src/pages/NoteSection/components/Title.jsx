@@ -8,7 +8,10 @@ function Title(){
 
     return(
         <> 
-            {note && <CreateNotes onClose={() => setNotes(false)}/>}
+            {note && 
+            <CreateNotes 
+                onClose={() => setNotes(false)}    
+            />}
             <div style={headerStyle} className="title-box">
                 <h2 style={titleStyle}>
                     <i className="fas fa-sticky-note"></i>

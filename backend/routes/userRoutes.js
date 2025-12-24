@@ -20,7 +20,7 @@ router.get('/' , (req , res) => {
 
 router.get('/tasks' , get_task);
 router.post('/tasks/:groupId' , add_task);
-router.put('/task/:taskId' , update_task);
+router.put('/tasks/:taskId' , update_task);
 
 router.get('/groups' , get_dashboard);
 router.post('/groups' , create_group);

@@ -12,13 +12,13 @@ function Header(){
                 <div style={{display: "flex" , alignItems: "center"}}>
                     <h1 className="page-title"><span>to-Do</span> Manage All Your Task</h1>
                 </div>
-                <div className="header-actions">
+                {/* <div className="header-actions">
                     <button className="btn btn-primary"
                         onClick={() => setCreate(true)}
                     >
                         <i className="fas fa-layer-group"></i> New Study Group
                     </button>
-                </div>
+                </div> */}
             </header>
         </>
     )

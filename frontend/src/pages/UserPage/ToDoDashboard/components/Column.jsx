@@ -24,6 +24,7 @@ function Column({ status , tasks , total = 0}){
                                 pic={t?.userName}
                                 date={t?.dueDate}
                                 desc={t?.taskDesc}
+                                taskId={t?.taskId}
                             />
                         )
                     }

@@ -5,10 +5,23 @@ import SearchBar from "./components/Search";
 import ToDoCard from "./components/ToDoCard";
 import "./styles/ToDo.css"
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 function ToDo(){
 
     const {data} = useContext(TaskContext);
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.hash) {
+            // Escape special characters in hash
+            const id = location.hash.slice(1); // remove #
+            const el = document.querySelector(`#${CSS.escape(id)}`);
+            if (el) {
+                el.scrollIntoView({ behavior: "smooth" });
+            }
+        }
+    }, [location , data]);
 
     return(
         <>
@@ -23,6 +36,7 @@ function ToDo(){
                         Object.entries(data?.userData || {}).map(([title , tasks]) => (
 
                             <ToDoCard
+                                id={title}
                                 key={title}
                                 title={title}
                                 tasks={tasks}

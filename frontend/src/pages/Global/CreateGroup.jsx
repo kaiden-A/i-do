@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useContext, useState } from "react";
 import { DashboardContext } from "../Context/DashboardContext";
+import {useNavigate , useLocation} from 'react-router-dom'
 
 
 function CreateGroup({onClose}){
@@ -10,6 +11,9 @@ function CreateGroup({onClose}){
     const [email , setEmail] = useState("");
 
     const {setData} = useContext(DashboardContext);
+
+    const location = useLocation();
+    const navigate = useNavigate();
     
 
     const sendForm = async (e) => {
@@ -31,8 +35,13 @@ function CreateGroup({onClose}){
             )
 
             if(res.data.success){
-                setData(d => [...d , res.data.group ]);
-                onClose();
+
+                if(location.pathname === '/studies'){
+                    navigate('/dashboard');   
+                }
+                setData(d => [...d , res.data.group])
+
+
             }
 
         }catch(err){

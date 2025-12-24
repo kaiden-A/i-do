@@ -1,11 +1,17 @@
+import { useState } from "react";
+import ChangeStatus from "./ChangeStatus";
 
+function Card({status , title , desc , pic , date , taskId}){
 
-function Card({status , title , desc , pic , date}){
+    const [openStatus , setOpenStatus] = useState(false);
 
 
     return(
         <>
-            <div className={`task-card ${statusCard(status)}`}>
+            {openStatus && <ChangeStatus title={title} onClose={() => setOpenStatus(false)} taskId={taskId} />}
+            <div className={`task-card ${statusCard(status)}`}
+                onClick={() => setOpenStatus(true)}
+            >
                 <div className="task-title">{title}</div>
                 <p className="task-desc">{desc}</p>
                 <div className="task-meta">

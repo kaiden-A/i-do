@@ -43,7 +43,8 @@ export const get_task = catchAsync(async (req , res) => {
         `
         SELECT 
             u.user_name AS userName, 
-            g.group_name AS groupName, 
+            g.group_name AS groupName,
+            t.task_id AS taskId, 
             t.title AS task, 
             t.task_desc AS taskDesc, 
             t.status AS status, 
@@ -218,25 +219,42 @@ export const get_notes = catchAsync( async(req , res) => {
         WHERE g.group_id  IN ( SELECT group_id FROM members WHERE user_id = ?);
         `,
         [user.user_id]
-    )
+    );
+
+    const [rowsGroup] = await db.query(
+        `
+        SELECT 
+            group_id AS groupId,
+            group_name AS groupName
+        FROM GROUP_TASK g
+        WHERE g.group_id IN (
+            SELECT group_id
+            FROM MEMBERS 
+            WHERE user_id = ?
+        );
+        `,
+        [user.user_id]
+    );
 
 
-    res.status(200).json({success : true , notes : rows})
+
+    res.status(200).json({success : true , notes : rows , groups : rowsGroup})
 
 } )
 
 export const add_notes = catchAsync( async(req , res) => {
 
     const groupId = req.params.groupId;
+    const user = req.user;
     const db = req.app.locals.db;
-    const {noteTypes , noteDetails} = req.body;
+    const {noteTypes , noteDetails , noteUrl} = req.body;
 
     const [result] = await db.query(
         `
-        INSERT INTO NOTES (group_id , note_types , note_details)
-        VALUES(? , ? , ?)
+        INSERT INTO NOTES (group_id , note_types , note_details , created_by , created_at , notes_link)
+        VALUES(? , ? , ?  ,? , ? , ?)
         `,
-        [groupId , noteTypes , noteDetails]
+        [groupId , noteTypes , noteDetails , user.user_id , new Date() , noteUrl === "" ? null : noteUrl]
     );
 
     if(result.affectedRows === 0){
@@ -249,9 +267,13 @@ export const add_notes = catchAsync( async(req , res) => {
         `
         SELECT 
             g.group_name AS groupName , 
-            n.note_types AS types , 
-            n.note_details AS details 
+            n.note_types  AS types, 
+            n.note_details AS details,
+            n.notes_link AS notesLink,
+            u.user_name AS createdBy,
+            DATE_FORMAT(n.created_at, '%d %b %Y') AS createdAt
         FROM NOTES n JOIN GROUP_TASK g ON g.group_id = n.group_id
+        JOIN USERS u ON n.created_by = u.user_id
         WHERE note_id = ?;
         `,
         [noteId]
@@ -261,7 +283,7 @@ export const add_notes = catchAsync( async(req , res) => {
         throw new AppError('notes not found' , 404)
     }
 
-    res.status(201).json({success : true , message : "Successfully Add Notes" , data : rows[0]})
+    res.status(201).json({success : true , message : "Successfully Add Notes" , note : rows[0]})
 
 })
 
@@ -280,13 +302,15 @@ export const update_task = catchAsync( async(req , res) => {
         WHERE TASK_ID = ?
         `,
         [status , taskId]
-    )
+    );
+
+    console.log(result);
 
     if(result.affectedRows === 0){
         throw new AppError('Fail Updated the status' , 400)
     }
 
-    res.status(201).json({success : true , message : 'successfully change the status'})
+    res.status(201).json({success : true , message : `successfully change status to ${status}`})
 })
 
 export const create_invite = catchAsync( async(req , res) => {

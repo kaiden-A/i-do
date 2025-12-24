@@ -1,11 +1,17 @@
-
+import { useNavigate } from "react-router-dom";
 
 function GroupCard({name , totalMembers , totalComplete , totalTask , desc}){
+
+    const navigate = useNavigate();
+
+    const goNavigate = () => {
+        navigate(`/studies/#${name}`)
+    }
 
     return(
         <>
                 
-            <div className="group-card">
+            <div className="group-card" onClick={goNavigate}>
                 <div className="group-header">
                     <h3 className="group-name">{name}</h3>
                     <div className="members-count">

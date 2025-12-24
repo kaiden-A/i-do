@@ -1,38 +1,12 @@
-import { useEffect, useState } from "react";
 import NotesCard from "./components/NotesCard";
 import Title from "./components/Title";
 import "./styles/Notes.css"
-import axios from "axios";
+import { useContext } from "react";
+import { NotesContext } from "../Context/NotesContext";
 
 function Notes(){
 
-    const [notes , setNotes] = useState([]);
-
-    useEffect(() => {
-
-        const fetchNotes = async () => {
-
-            try{
-
-                const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/notes` , 
-                    {withCredentials : true}
-                )
-
-                console.log(res.data);
-
-                setNotes(res.data.notes);
-
-            }catch(err){
-                console.log(err);
-                throw new Error(err);
-            }
-
-        }
-
-        fetchNotes();
-
-    }, [])
-
+    const {notes} = useContext(NotesContext);
 
     return(
         <div className="mother">

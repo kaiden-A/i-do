@@ -39,7 +39,8 @@ function CreateGroup({onClose}){
                 if(location.pathname === '/studies'){
                     navigate('/dashboard');   
                 }
-                setData(d => [...d , res.data.group])
+                setData(d => [...d , res.data.group]);
+                onClose();
 
 
             }

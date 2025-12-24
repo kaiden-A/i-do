@@ -1,11 +1,35 @@
+import axios from "axios";
 import { useState } from "react";
 
 
-function CreateTask({onClose}){
+function CreateTask({onClose , members , groupId , onSuccess}){
 
     const [title , setTitle] = useState("");
     const [desc , setDesc] = useState("");
     const [due , setDue] = useState("");
+    const [userId , setUserId] = useState("");
+
+
+    const sendForm = async (e) => {
+
+        e.preventDefault();
+
+        try{
+
+            const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/tasks/${groupId}` , 
+                {picId : userId, title , desc , due},
+                {withCredentials : true}
+            );
+
+            if(res.data.success){
+                onSuccess();
+                onClose();
+            }
+
+        }catch(err){
+            console.error(err.responses.data.message || err.message)
+        }
+    }
 
     return(
         <>
@@ -15,7 +39,7 @@ function CreateTask({onClose}){
                     <h3 className="modal-title">Add New Study Task</h3>
                     <button className="close-btn" onClick={onClose}>&times;</button>
                 </div>
-                <form id="addTaskForm">
+                <form id="addTaskForm" onSubmit={sendForm}>
                     <div className="form-group">
                         <label className="form-label" htmlFor="taskTitle">Task Title</label>
                         <input 
@@ -40,13 +64,18 @@ function CreateTask({onClose}){
                     </div>
                     <div className="form-group">
                         <label className="form-label" htmlFor="taskAssignee">Assign To</label>
-                        <select id="taskAssignee" className="form-control">
+                        <select 
+                            id="taskAssignee" 
+                            className="form-control"
+                            value={userId}
+                            onChange={(e) => setUserId(e.target.value)}
+                        >
                             <option value="" disabled>Group Member</option>
-                            <option value="AS">Alex Smith</option>
-                            <option value="MJ">Maria Johnson</option>
-                            <option value="RJ">Robert Jones</option>
-                            <option value="KB">Katie Brown</option>
-                            <option value="DL">David Lee</option>
+                            {
+                                members.map(m => 
+                                    <option key={m.userId} value={m.userId}>{m.userName}</option>
+                                )
+                            }
                         </select>
                     </div>
                     <div className="form-group">

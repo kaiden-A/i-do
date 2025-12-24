@@ -66,7 +66,7 @@ function ChangeStatus({title , onClose , taskId}){
                 message={msg}
                 open={noti}
                 onClose={() => setNoti(false)}
-                popup={true}
+                success={true}
             />            
             <div className="modal active">
                 <div className="modal-content">

@@ -12,6 +12,8 @@ function ToDo(){
     const {data} = useContext(TaskContext);
     const location = useLocation();
 
+    
+
     useEffect(() => {
         if (location.hash) {
             // Escape special characters in hash
@@ -35,11 +37,15 @@ function ToDo(){
                     {
                         Object.entries(data?.userData || {}).map(([title , tasks]) => (
 
+                            
+
                             <ToDoCard
-                                id={title}
-                                key={title}
+                                key={tasks[0]?.groupId}
                                 title={title}
                                 tasks={tasks}
+                                groupId={tasks[0]?.groupId}
+                                members={data?.members[title]}
+                                
                             />
                         ))
                     }

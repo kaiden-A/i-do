@@ -28,7 +28,7 @@ router.post('/groups' , create_group);
 router.get('/notes' , get_notes);
 router.post('/notes/:groupId' , add_notes );
 
-router.post('/invite/create' , create_invite);
+router.post('/invite/create/:groupId' , create_invite);
 router.post('/invite/join' , join_invite);
 
 export default router;

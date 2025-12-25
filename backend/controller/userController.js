@@ -127,11 +127,6 @@ export const create_group = catchAsync( async (req , res) => {
     const db = req.app.locals.db;
     const {groupName , desc , emails} = req.body;
 
-    let existingUsers = [];
-    let existingEmail = [];
-    let notFoundEmails = [];
-    
-
     const [result] = await db.query(
         'INSERT INTO GROUP_TASK(group_name , group_desc , group_admin) VALUES(? , ? , ?)',
         [groupName , desc , user.user_id]
@@ -151,76 +146,62 @@ export const create_group = catchAsync( async (req , res) => {
     if(resultInsert.affectedRows === 0){
         throw new AppError("Fail Add Admin" , 400);
     }
-    
-    if(emails && emails.length > 0){
 
-        const uniqueEmails = [...new Set(emails)].filter(e => e !== user.email);
-        
-        if(uniqueEmails.length > 0){
-            [existingUsers] = await db.query(
-                'SELECT user_id , email FROM USERS WHERE email IN(?)',
-                [uniqueEmails]
-            )
-        }
 
-        existingEmail = existingUsers.map(u => u.email);
-        notFoundEmails = uniqueEmails.filter(emails => !existingEmail.includes(emails));
+    if(emails.length > 0){
 
-        if(existingEmail.length > 0){
-            
-            const values = existingUsers.map( u => [u.user_id , groupId , new Date()]);
+        const inviteToken = crypto.randomBytes(10).toString("hex"); 
+        const expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); 
 
-            await db.query(
-                `INSERT INTO MEMBERS(user_id , group_id , joined_at) 
-                VALUES ?
-                `,
-                [values]
-            );
+        const [resultInvite] = await db.query(
+            `
+            INSERT INTO INVITES (group_id , invite_token , expires_at)
+            VALUES(? , ? , ?)
+            `,
+            [groupId , inviteToken , expiresAt]
+        )
 
-        }
+        const inviteId = resultInvite.insertId;
 
-        const validExistingUsers = existingUsers.filter(u => u.email);  
-        const validNotFoundEmails = notFoundEmails.filter(e => e);
+        const [invite] = await db.query(
+            `
+            SELECT  
+                group_id AS groupId,
+                inviteToken AS inviteToken,
+            FROM INVITES
+            WHERE invite_id ?
+            `,
+            [inviteId]
+        );
 
-        if (validExistingUsers.length === 0 && validNotFoundEmails.length === 0) {
-            console.log("No valid emails to send invites.");
-        }
+        await Promise.all(emails.map(email =>
+            sendEmail({
+                to: email,
+                subject: "Group invitation",
+                text: 
+                    `
+                    You were invited to join "${groupName}". 
+                    Join by clicking this link 
+                    ${process.env.FRONTEND_URL}/join/${invite[0].groupId}/${invite[0].inviteToken}
+                    `
+            })
+        ));
 
-        if (validExistingUsers.length > 0) {
-            await Promise.all(validExistingUsers.map(u =>
-                sendEmail({
-                    to: u.email,
-                    subject: `Added to Group ${groupName}`,
-                    text: `You were invited to join ${groupName}. Visit ${process.env.FRONTEND_URL}`
-                })
-            ));
-        }
-
-        if (validNotFoundEmails.length > 0) {
-            await Promise.all(validNotFoundEmails.map(email =>
-                sendEmail({
-                    to: email,
-                    subject: "Group invitation",
-                    text: `You were invited to join "${groupName}". Create an account at "${process.env.FRONTEND_URL}/signup`
-                })
-            ));
-        }
 
 
     }
+            
 
     res.status(201).json({
         success : true , 
-        msg : `Successfully create ${groupName}` , 
+        message : `Successfully create ${groupName}` , 
         group : {
             groupName,
             groupDesc : desc,
-            totalMembers: 1 + existingUsers.length,
+            totalMembers: 1,
             totalTask: 0,
             totalComplete: 0
         },
-        successInvite : existingEmail , 
-        failInvite : notFoundEmails
     })
 
     

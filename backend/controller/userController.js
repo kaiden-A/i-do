@@ -416,4 +416,33 @@ export const join_invite = catchAsync( async(req , res) => {
     }
 
     res.status(201).json({success : true , message : "successfully add new members"})
+});
+
+export const send_invite = catchAsync( async(req , res) => {
+
+    const db = req.app.locals.db;
+    const {emails , groupId , link} = req.body;
+
+    const [rows] = await db.query(
+
+        `
+        SELECT group_name AS groupName
+        FROM GROUP_TASK
+        WHERE group_id = ?
+        `,
+        [groupId]
+    )
+    await Promise.all(emails.map(email =>
+        sendEmail({
+            to: email,
+            subject: "Group invitation",
+            text: 
+                `
+                You were invited to join "${rows[0].groupName}". 
+                Join by clicking this link ${link}
+                `
+        })
+    ));
+
+    res.status(200).json({success : true , message : "Successfully Sends Emails"})
 })

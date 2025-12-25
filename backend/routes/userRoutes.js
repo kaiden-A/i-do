@@ -8,6 +8,7 @@ import {
     get_notes, 
     get_task, 
     join_invite, 
+    send_invite, 
     update_task
 } from "../controller/userController.js";
 
@@ -30,5 +31,6 @@ router.post('/notes/:groupId' , add_notes );
 
 router.post('/invite/create/:groupId' , create_invite);
 router.post('/invite/join' , join_invite);
+router.post('/invite/email' , send_invite )
 
 export default router;

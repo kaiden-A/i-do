@@ -7,6 +7,10 @@ function AddMembers({onClose , groupId}){
 
     const [link , setLink] = useState("creating a link...");
     const [copied , setCopied] = useState(false);
+    const [msg , setMsg] = useState("");
+    const [send , setSend] = useState(false);
+
+    const [email , setEmail] = useState("");
 
     useEffect(() => {
 
@@ -32,11 +36,41 @@ function AddMembers({onClose , groupId}){
 
     }, []);
 
+    const sendEmails = async (e) => {
+
+        e.preventDefault();
+
+        if(!link) return;
+
+        try{
+
+            const emails = email
+                .split(',')
+                .map(e => e.trim())
+                .filter(e => e && e.includes('@')); // only keep valid emails
+
+            const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/invite/email` , 
+                {emails : emails , link : link , groupId : groupId},
+                {withCredentials : true}
+            );
+
+            if(res.data.succsess){
+                setMsg(res.data.message);
+                setSend(true);
+            }
+
+        }catch(err){
+            console.error(err.response?.data?.message || err.message);
+        }
+
+    }
+
     const copyLink = async () =>{
 
         try{
 
             await navigator.clipboard.writeText(link);
+            setMsg("successfully copied link");
             setCopied(true);
 
         }catch(err){
@@ -50,8 +84,14 @@ function AddMembers({onClose , groupId}){
             <Notifications
                 open={copied}
                 onClose={() => setCopied(false)}
-                message={"successfully copied link"}
+                message={msg}
                 popup={true}
+            />
+            <Notifications
+                open={send}
+                onClose={() => setSend(false)}
+                message={msg}
+                success={true}
             />
             <div className="modal active" id="inviteMemberModal">
                 <div className="modal-content">
@@ -59,7 +99,7 @@ function AddMembers({onClose , groupId}){
                         <h3 className="modal-title">Invite Study Partners</h3>
                         <button className="close-btn" onClick={onClose}>&times;</button>
                     </div>
-                    <form id="inviteMemberForm">
+                    <form onSubmit={sendEmails}>
                         <div className="form-group">
                             <label className="form-label">Add by Email</label>
                             <input 
@@ -67,6 +107,8 @@ function AddMembers({onClose , groupId}){
                                 id="inviteEmails" 
                                 className="form-control" 
                                 placeholder="student1@university.edu, student2@university.edu"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                             />
                         </div>
                         <div className="form-group">

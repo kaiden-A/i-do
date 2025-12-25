@@ -6,7 +6,7 @@ import sendEmail from '../utils/sendEmail.js';
 export const get_dashboard = catchAsync(async (req , res) => {
 
     const user = req.user;
-    const db = req.app.locals.db;
+    const db = req.app.locals.db; 
 
     const [rows] = await db.query(
         `
@@ -113,6 +113,37 @@ export const add_task = catchAsync( async (req , res) => {
         throw new AppError("Fail Creating The Task" , 400);
     }
 
+    const [rowsUser] = await db.query(
+        `
+        SELECT
+            U.EMAIL AS email,
+            U.USER_NAME AS userName,
+            G.GROUP_NAME AS groupName
+        FROM USERS U
+        JOIN MEMBERS M ON U.USER_ID = M.USER_ID
+        JOIN GROUP_TASK G ON M.GROUP_ID = G.GROUP_ID 
+        WHERE U.USER_ID = ? AND G.GROUP_ID = ?
+        `,
+        [picId , groupId]
+    );
+
+
+    await sendEmail({
+        to : rowsUser[0].email,
+        subject : "You Have Been Assigned a Task",
+        text : 
+            `
+            Hi ${rowsUser[0].userName},
+
+            You've been assigned a new task in "${rowsUser[0].groupName}":
+            "${title}"
+
+            Check it out on your dashboard:
+            ${process.env.FRONTEND_URL}/dashboard
+            `
+    })
+
+
     const taskId = result.insertId;
 
     res.status(201).json({success : true , msg : 'Successfully Created The Task'});
@@ -180,8 +211,9 @@ export const create_group = catchAsync( async (req , res) => {
                 subject: "Group invitation",
                 text: 
                     `
-                    You were invited to join "${groupName}". 
-                    Join by clicking this link 
+                    You have been invited to join the group "${groupName}".
+
+                    To accept the invitation, please click the link below:
                     ${process.env.FRONTEND_URL}/join/${invite[0].groupId}/${invite[0].inviteToken}
                     `
             })
@@ -419,8 +451,10 @@ export const send_invite = catchAsync( async(req , res) => {
             subject: "Group invitation",
             text: 
                 `
-                You were invited to join "${rows[0].groupName}". 
-                Join by clicking this link ${link}
+                You have been invited to join the group "${rows[0].groupName}".
+
+                To accept the invitation, please click the link below:
+                ${link}
                 `
         })
     ));

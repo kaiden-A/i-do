@@ -125,7 +125,7 @@ function Login(){
                     
                     <div className="auth-switch">
                         Don't have an account?
-                        <Link to={'/signup'}>Create account</Link>
+                        <Link to={'/signup'} state={location.state}>Create account</Link>
                     </div>
                     
                     <div className="form-footer">

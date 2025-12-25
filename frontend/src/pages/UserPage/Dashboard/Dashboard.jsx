@@ -5,27 +5,39 @@ import "./styles/Dashboard.css"
 import "./styles/GroupCard.css"
 
 import Notifications from "../../Global/Notifications";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState , useRef} from "react";
 import { useNavigate } from "react-router-dom";
 import { DashboardContext } from "../../Context/DashboardContext";
 function Dashboard(){
 
     const [noti , setNoti] = useState(false);
-    const {data , setData} = useContext(DashboardContext);
+    const {data} = useContext(DashboardContext);
+    
     const navigate = useNavigate();
+    const firstTime = useRef(true);
 
     useEffect(() => {
-        const openTimer = setTimeout(() => {
-            setNoti(true);
 
-            const closeTimer = setTimeout(() => {
-                setNoti(false);
-            }, 3000); 
+        if(!firstTime.current) return;
 
-            return () => clearTimeout(closeTimer);
-        }, 1000);
+        if(firstTime.current){
+            const openTimer = setTimeout(() => {
+                setNoti(true);
 
-        return () => clearTimeout(openTimer);
+                const closeTimer = setTimeout(() => {
+                    setNoti(false);
+                }, 3000); 
+
+                firstTime.current = false;
+
+                return () => clearTimeout(closeTimer);
+            }, 1000);
+
+            return () => {
+                clearTimeout(openTimer);
+            };
+        }
+
     }, []);
     
 

@@ -1,13 +1,13 @@
-import {BrowserRouter , Link , Routes , Route} from 'react-router-dom';
+import {BrowserRouter , Routes , Route} from 'react-router-dom';
 import UserPage from './pages/UserPage/UserPage';
 import Dashboard from './pages/UserPage/Dashboard/Dashboard';
 import SignPage from './pages/SignPage/SignPage';
 import ToDo from './pages/UserPage/ToDoDashboard/ToDo';
 import Notes from './pages/NoteSection/Notes';
-import DragSnap from './DragSnap';
 import { TaskProvider } from './pages/Context/TaskContext';
 import { DashboardProvider } from './pages/Context/DashboardContext';
 import { NotesProvider } from './pages/Context/NotesContext';
+import JoinGroup from './pages/JoinGroup/JoinGroup';
 
 function App() {
 
@@ -19,6 +19,7 @@ function App() {
           <Route path='/login' element={<SignPage login={true}/>}/>
           <Route path='/signup' element={<SignPage login={false}/>}/>
 
+          <Route path='/join/:groupId/:tokenId' element={<JoinGroup/>}/>
 
           <Route path='/' element={<UserPage/>}>
             <Route path='dashboard' element={
@@ -37,8 +38,6 @@ function App() {
               </NotesProvider>
             } />
           </Route>
-
-          <Route path='/test' element={<DragSnap/>} />
 
       </Routes>
     </BrowserRouter>

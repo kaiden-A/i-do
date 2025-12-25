@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
-import { Link , useNavigate} from "react-router-dom";
+import { Link , useNavigate , useLocation} from "react-router-dom";
 import Notifications from "../../Global/Notifications";
 
 function Signup(){
@@ -19,6 +19,9 @@ function Signup(){
     const [succBox , setSuccBox] = useState(false);
 
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const redirectTo = location.state?.redirectTo || '/dashboard';
 
     const sendForm = async (e) => {
 
@@ -38,7 +41,7 @@ function Signup(){
 
 
             if(res.data.success){
-                navigate('/dashboard');
+                navigate(redirectTo , {replace : true});
             }
 
 

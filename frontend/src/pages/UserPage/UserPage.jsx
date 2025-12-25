@@ -1,6 +1,6 @@
 import SideBar from "./SideBar/SideBar";
 import { Outlet } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useNavigate , useLocation} from "react-router-dom";
 
 import { useEffect } from "react";
 import axios from "axios";
@@ -8,6 +8,7 @@ import axios from "axios";
 function UserPage(){
 
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
 
@@ -15,19 +16,18 @@ function UserPage(){
                 
                 try{
 
-                    const res = await axios.get(
-                        `${import.meta.env.VITE_BACKEND_URL}/api/` , 
+                    const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/` , 
                         {withCredentials : true}
                     )
 
-                    if(!res.data.success){
-                        throw new Error(res.data.message);
+                    if(res.data.success){
+                        if(location.pathname === '/' || location.pathname === '/login'){
+                            navigate('/dashboard');
+                        }
                     }
 
-                    navigate('/dashboard');
-
                 }catch(err){
-                    console.log(err);
+                    console.error(err.response?.data?.message || err.message);
 
                     if(err.response?.status === 401){
                         navigate('/login')
@@ -39,7 +39,8 @@ function UserPage(){
         
         fetchData();
 
-    }, [])
+
+    }, [location.pathname])
 
 
     return(

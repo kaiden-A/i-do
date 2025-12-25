@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate , useLocation } from "react-router-dom";
 import axios from 'axios';
 
 import Notifications from "../../Global/Notifications";
@@ -16,6 +16,9 @@ function Login(){
     const [success , setSuccess] = useState(false);
 
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const redirectTo = location.state?.redirectTo || "/dashboard";
 
     const handleForm = async (e) => {
 
@@ -35,7 +38,7 @@ function Login(){
                 throw new Error(res.data.message);
             }
 
-            navigate('/dashboard');
+            navigate(redirectTo , {replace : true});
         }catch(err){
 
             console.error(err);

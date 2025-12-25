@@ -5,7 +5,7 @@ import Notifications from "../../../Global/Notifications";
 
 function AddMembers({onClose , groupId}){
 
-    const [link , setLink] = useState("");
+    const [link , setLink] = useState("creating a link...");
     const [copied , setCopied] = useState(false);
 
     useEffect(() => {

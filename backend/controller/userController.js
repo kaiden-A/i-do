@@ -373,18 +373,34 @@ export const join_invite = catchAsync( async(req , res) => {
 
     const {groupId , tokenId} = req.body;
 
-    const [rowsAdmin] = await db.query(
+    const [rowsLink] = await db.query(
         `
-        SELECT
-            group_admin AS groupAdmin  
-        FROM GROUP_TASK 
-        WHERE group_admin = ? AND group_id = ?
+        SELECT 
+            CASE 
+                WHEN expires_at < NOW() THEN 'EXPIRED'
+                ELSE 'VALID'
+            END AS tokenStatus
+        FROM invites
+        WHERE invite_token = ?
         `,
-        [user.user_id , groupId]
+        [tokenId]
     )
 
-    if(rowsAdmin[0].groupAdmin === user.user_id){
-        return res.status(200).json({success : true , message : "User is an admin", redirectedTo : '/dashboard'});
+    if(rowsLink[0].tokenStatus === "EXPIRED"){
+        throw new AppError("Invites Link is Expired" , 410);
+    }
+
+    const [rowsMember] = await db.query(
+        `
+        SELECT *
+        FROM MEMBERS
+        WHERE user_id = ? AND group_id = ?
+        `,
+        [user.user_id, groupId]
+    );
+
+    if (rowsMember.length > 0) {
+        throw new AppError("User is already in the group", 409);
     }
 
     const [result] = await db.query(
@@ -396,7 +412,7 @@ export const join_invite = catchAsync( async(req , res) => {
     )
 
     if(result.affectedRows === 0){
-        throw new AppError("User Doesnt Exist" , 401);
+        throw new AppError("User Doesnt Exist" , 404);
     }
 
     res.status(201).json({success : true , message : "successfully add new members"})

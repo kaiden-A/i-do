@@ -54,11 +54,21 @@ function AddMembers({onClose , groupId}){
                 {withCredentials : true}
             );
 
-            if(res.data.succsess){
+            if(res.data.success){
                 setMsg(res.data.message);
                 setSend(true);
             }
+ 
 
+
+
+
+
+
+
+
+
+            
         }catch(err){
             console.error(err.response?.data?.message || err.message);
         }

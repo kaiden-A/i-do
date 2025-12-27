@@ -6,7 +6,8 @@ import cors from 'cors';
 import connectDb from './database/database.js';
 import authRoutes from './routes/authRoutes.js'
 import errorHandler from './middleware/errorHandler.js';
-import sendEmail from './utils/sendEmail.js';
+import MemberRepository from './repositories/memberRepository.js';
+import GroupRepository from './repositories/groupRepository.js';
 
 dotenv.config();
 const app = express();
@@ -26,6 +27,7 @@ const PORT = process.env.PORT || 5000;
 //establish connection
 const db = await connectDb();
 app.locals.db = db;
+
 
 app.get('/' , (req , res) => {
     res.json({msg : "opening website"})

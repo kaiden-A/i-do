@@ -4,52 +4,43 @@ class GroupRepository{
         this.db = db;
     }
 
-    async groupData(userId){
+    async createNewGroup(groupName , desc , userId){
 
-        const [rows] = await this.db.query(
-            `
-            SELECT 
-                g.group_id AS groupId,
-                g.group_name AS groupName,
-                t.task_id AS taskId, 
-                t.title AS task, 
-                t.task_desc AS taskDesc, 
-                t.status AS status, 
-                DATE_FORMAT(t.due_date, '%b %d %Y') AS dueDate,
-                task_user.user_name AS userName
-            FROM GROUP_TASK g
-            LEFT JOIN TASK t ON t.group_id = g.group_id
-            LEFT JOIN USERS task_user ON task_user.user_id = t.user_id
-            WHERE g.group_id IN (SELECT group_id FROM MEMBERS WHERE user_id = ?);
-            `,
-            [userId , userId]
+        const [result] = await this.db.query(
+            'INSERT INTO GROUP_TASK(group_name , group_desc , group_admin) VALUES(? , ? , ?)',
+            [groupName , desc , userId]
         );
 
-        return rows;
+        return result;
     }
 
-
-    async groupMembers(userId){
-
-        const [rowsGroupMembers] = await db.query(
-            `SELECT
-                G.GROUP_ID AS groupId,
-                G.GROUP_NAME AS groupName,
-                U.USER_NAME AS userName,
-                U.USER_ID AS userId
-            FROM GROUP_TASK G
-            JOIN MEMBERS M ON G.GROUP_ID = M.GROUP_ID
-            JOIN USERS U ON M.USER_ID = U.USER_ID
-            WHERE G.GROUP_ID IN (
-                SELECT M2.GROUP_ID
-                FROM MEMBERS M2
-                WHERE M2.USER_ID = ?
-            )
+    async createGroupLink(groupId , inviteToken , expiresAt){
+        
+        const [resultInvite] = await this.db.query(
+            `
+            INSERT INTO INVITES (group_id , invite_token , expires_at)
+            VALUES(? , ? , ?)
             `,
-            [userId]
-        )
+            [groupId , inviteToken , expiresAt]
+        );
 
-        return rowsGroupMembers;
+        return resultInvite;
+    }
+
+    async takeToken(inviteId){
+
+        const [invite] = await this.db.query(
+            `
+            SELECT  
+                group_id AS groupId,
+                inviteToken AS inviteToken,
+            FROM INVITES
+            WHERE invite_id ?
+            `,
+            [inviteId]
+        );
+
+        return invite;
 
     }
 

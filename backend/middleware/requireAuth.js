@@ -1,10 +1,10 @@
 import jwt from 'jsonwebtoken';
 import AppError from '../utils/AppError.js';
+import pool from '../database/database.js';
 
 export default async function requireAuth(req , res , next){
 
     const token = req.cookies.jwt;
-    const db = req.app.locals.db;
 
     try{
 
@@ -14,7 +14,7 @@ export default async function requireAuth(req , res , next){
             return next(new AppError('Authentication token missing' , 401))
         }
 
-        const [rows]= await db.query(`SELECT user_id , user_name FROM USERS WHERE user_id = ? ` ,
+        const [rows]= await pool.query(`SELECT user_id , user_name FROM USERS WHERE user_id = ? ` ,
             [decodedToken.id]
         )
 

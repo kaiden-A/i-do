@@ -1,15 +1,12 @@
+import './config/env.js'
 import express from 'express';
-import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import cors from 'cors';
-import connectDb from './database/database.js';
 import authRoutes from './routes/authRoutes.js'
 import errorHandler from './middleware/errorHandler.js';
-import MemberRepository from './repositories/memberRepository.js';
-import GroupRepository from './repositories/groupRepository.js';
 
-dotenv.config();
+
 const app = express();
 
 app.use(cookieParser());
@@ -24,14 +21,6 @@ app.use(cors({
 
 const PORT = process.env.PORT || 5000;
 
-//establish connection
-const db = await connectDb();
-app.locals.db = db;
-
-
-app.get('/' , (req , res) => {
-    res.json({msg : "opening website"})
-})
 
 app.use('/api' ,  authRoutes);
 app.use(errorHandler);

@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import catchAsync from '../utils/catchAsync.js';
 import AppError from '../utils/AppError.js';
+import pool from '../database/database.js';
 
 async function hashedPassword(pasword){
 
@@ -26,11 +27,10 @@ function createToken(id){
 export const post_login = catchAsync( async (req , res) => {
 
     const {email , password , remember} = req.body;
-    const db = req.app.locals.db;
 
     
 
-    const [rows] = await db.query(
+    const [rows] = await pool.query(
         'SELECT * FROM USERS WHERE email = ?',
         [email]
     )
@@ -64,12 +64,12 @@ export const post_login = catchAsync( async (req , res) => {
 export const post_signup = catchAsync(async (req , res) => {
 
     const {userId , name , email , password } = req.body;
-    const db = req.app.locals.db;
+
 
     const hashPass = await hashedPassword(password);
     const createdAt = new Date();
 
-    const [row] = await db.query(
+    const [row] = await pool.query(
         'SELECT * FROM USERS WHERE email = ?',
         [email]
     );
@@ -78,7 +78,7 @@ export const post_signup = catchAsync(async (req , res) => {
         throw new AppError("Email Already Exist" , 400);
     }
 
-    const [result] = await db.query(
+    const [result] = await pool.query(
         'INSERT INTO USERS(user_id , user_name , email , hash_password , created_at) VALUES(? , ? , ? , ? , ?)' , 
         [userId , name , email , hashPass , createdAt]
     );

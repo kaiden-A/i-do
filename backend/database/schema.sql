@@ -1,54 +1,67 @@
-DROP TABLE MEMBERS;
-DROP TABLE NOTES;
-DROP TABLE USERS;
-DROP TABLE GROUP_TASK;
-
-CREATE TABLE USERS(
-	user_id INTEGER,
-	user_name VARCHAR(100),
-    email VARCHAR(100) ,
-    hash_password VARCHAR(200),
-    created_at DATE,
-    CONSTRAINT users_user_id_pk PRIMARY KEY(user_id),
-    CONSTRAINT users_email_uk UNIQUE(email)
-);
-
-CREATE TABLE GROUP_TASK(
-	group_id INTEGER,
-    group_name VARCHAR(30),
-    group_admin INTEGER,
-    CONSTRAINT group_task_group_id_pk PRIMARY KEY(group_id),
-    CONSTRAINT group_task_group_admin_fk FOREIGN KEY(group_admin) REFERENCES USERS(user_id)
-		ON DELETE CASCADE
-);
-
-CREATE TABLE MEMBERS(
-	group_id INTEGER,
-    user_id INTEGER,
-    joined_at DATE,
-    CONSTRAINT members_group_user_id_pk PRIMARY KEY(group_id , user_id),
-    CONSTRAINT members_group_id_fk FOREIGN KEY(group_id) REFERENCES GROUP_TASK(group_id) ON DELETE CASCADE,
-    CONSTRAINT members_user_id_fk FOREIGN KEY(user_id) REFERENCES USERS(user_id) ON DELETE CASCADE
-    
-);
-
-CREATE TABLE NOTES(
-	note_id INTEGER ,
-    group_id INTEGER,
-    note_types VARCHAR(100),
-    note_details VARCHAR(200),
-    CONSTRAINT notes_notes_id_pk PRIMARY KEY(note_id),
-    CONSTRAINT notes_group_id_fk FOREIGN KEY(group_id) REFERENCES GROUP_TASK(group_id) ON DELETE CASCADE
-);
-
-CREATE TABLE INVITES(
-	invite_id INTEGER,
-    group_id INTEGER,
-    invite_token VARCHAR(100),
-    expires_at date,
-    CONSTRAINT invites_invite_id_pk PRIMARY KEY(invite_id),
-    CONSTRAINT invites_group_id FOREIGN KEY(group_id) REFERENCES GROUP_TASK(group_id)
-);
 
 
+-- -- 1. Users Table
+-- CREATE TABLE users (
+--     user_id INT PRIMARY KEY,
+--     user_name VARCHAR(100),
+--     email VARCHAR(100) UNIQUE,
+--     hash_password VARCHAR(200),
+--     created_at DATE
+-- );
 
+-- -- 2. Groups Table
+-- CREATE TABLE group_task (
+--     group_id INT AUTO_INCREMENT PRIMARY KEY,
+--     group_name VARCHAR(100),
+--     group_admin INT,
+--     group_desc VARCHAR(200),
+--     FOREIGN KEY (group_admin) REFERENCES users(user_id) ON DELETE CASCADE
+-- );
+
+-- -- 3. Group Members (Linking Users to Groups)
+-- CREATE TABLE members (
+--     group_id INT,
+--     user_id INT,
+--     joined_at DATE,
+--     PRIMARY KEY (group_id, user_id),
+--     FOREIGN KEY (group_id) REFERENCES group_task(group_id) ON DELETE CASCADE,
+--     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+-- );
+
+-- -- 4. Tasks Table
+-- CREATE TABLE task (
+--     task_id INT AUTO_INCREMENT PRIMARY KEY,
+--     group_id INT,
+--     created_by INT,
+--     user_id INT, -- Assigned User
+--     title VARCHAR(100),
+--     task_desc VARCHAR(100),
+--     status VARCHAR(10),
+--     created_at DATE,
+--     due_date DATE,
+--     FOREIGN KEY (group_id) REFERENCES group_task(group_id) ON DELETE CASCADE,
+--     FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE CASCADE,
+--     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+-- );
+
+-- -- 5. Notes Table
+-- CREATE TABLE notes (
+--     note_id INT AUTO_INCREMENT PRIMARY KEY,
+--     group_id INT,
+--     note_types VARCHAR(100),
+--     note_details VARCHAR(200),
+--     created_by INT,
+--     created_at DATE,
+--     notes_link VARCHAR(150),
+--     FOREIGN KEY (group_id) REFERENCES group_task(group_id) ON DELETE CASCADE,
+--     FOREIGN KEY (created_by) REFERENCES users(user_id)
+-- );
+
+-- -- 6. Invites Table
+-- CREATE TABLE invites (
+--     invite_id INT AUTO_INCREMENT PRIMARY KEY,
+--     group_id INT,
+--     invite_token VARCHAR(100),
+--     expires_at DATE,
+--     FOREIGN KEY (group_id) REFERENCES group_task(group_id)
+-- );

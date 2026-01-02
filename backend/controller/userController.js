@@ -2,13 +2,14 @@ import AppError from "../utils/AppError.js";
 import catchAsync from "../utils/catchAsync.js";
 import crypto from 'crypto';
 import sendEmail from '../utils/sendEmail.js';
+import pool from "../database/database.js";
 
 export const get_dashboard = catchAsync(async (req , res) => {
 
     const user = req.user;
-    const db = req.app.locals.db; 
+     
 
-    const [rows] = await db.query(
+    const [rows] = await pool.query(
         `
         SELECT 
             u.user_name AS userName,
@@ -36,10 +37,10 @@ export const get_dashboard = catchAsync(async (req , res) => {
 export const get_task = catchAsync(async (req , res) => {
 
     const user = req.user;
-    const db = req.app.locals.db;
+    
 
 
-    const [rows] = await db.query(
+    const [rows] = await pool.query(
         `
         SELECT 
             g.group_id AS groupId,
@@ -58,7 +59,7 @@ export const get_task = catchAsync(async (req , res) => {
         [user.user_id , user.user_id]
     );
 
-    const [rowsGroupMembers] = await db.query(
+    const [rowsGroupMembers] = await pool.query(
         `SELECT
             G.GROUP_ID AS groupId,
             G.GROUP_NAME AS groupName,
@@ -96,12 +97,12 @@ export const add_task = catchAsync( async (req , res) => {
 
     const user = req.user;
     const groupId = req.params.groupId;
-    const db = req.app.locals.db;
+    
 
     const {picId , title , desc , due} = req.body;
 
     const status = "prep"
-    const [result] = await db.query(
+    const [result] = await pool.query(
             `INSERT INTO TASK 
                 ( group_id , created_by , user_id , title , task_desc , status , created_at , due_date)
             VALUES( ? , ? , ? , ? , ? , ?  , ? , ?)
@@ -113,7 +114,7 @@ export const add_task = catchAsync( async (req , res) => {
         throw new AppError("Fail Creating The Task" , 400);
     }
 
-    const [rowsUser] = await db.query(
+    const [rowsUser] = await pool.query(
         `
         SELECT
             U.EMAIL AS email,
@@ -155,10 +156,10 @@ export const add_task = catchAsync( async (req , res) => {
 export const create_group = catchAsync( async (req , res) => {
 
     const user = req.user;
-    const db = req.app.locals.db;
+    
     const {groupName , desc , emails} = req.body;
 
-    const [result] = await db.query(
+    const [result] = await pool.query(
         'INSERT INTO GROUP_TASK(group_name , group_desc , group_admin) VALUES(? , ? , ?)',
         [groupName , desc , user.user_id]
     )
@@ -169,7 +170,7 @@ export const create_group = catchAsync( async (req , res) => {
 
     const groupId = result.insertId;
 
-    const [resultInsert] = await db.query(
+    const [resultInsert] = await pool.query(
         'INSERT INTO MEMBERS (user_id , group_id , joined_at) VALUES (? , ? , ?)',
         [user.user_id , groupId , new Date()]
     )
@@ -184,7 +185,7 @@ export const create_group = catchAsync( async (req , res) => {
         const inviteToken = crypto.randomBytes(10).toString("hex"); 
         const expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); 
 
-        const [resultInvite] = await db.query(
+        const [resultInvite] = await pool.query(
             `
             INSERT INTO INVITES (group_id , invite_token , expires_at)
             VALUES(? , ? , ?)
@@ -194,7 +195,7 @@ export const create_group = catchAsync( async (req , res) => {
 
         const inviteId = resultInvite.insertId;
 
-        const [invite] = await db.query(
+        const [invite] = await pool.query(
             `
             SELECT  
                 group_id AS groupId,
@@ -242,16 +243,16 @@ export const create_group = catchAsync( async (req , res) => {
 export const get_notes = catchAsync( async(req , res) => {
     
     const user = req.user;
-    const db = req.app.locals.db;
+    
 
-    const [rows] = await db.query(
+    const [rows] = await pool.query(
         `
         SELECT 
             g.group_name AS groupName , 
             n.note_types  AS types, 
             n.note_details AS details,
             n.notes_link AS notesLink,
-            u.user_name AS createdBy,
+            u.user_name AS createpooly,
             DATE_FORMAT(n.created_at, '%d %b %Y') AS createdAt
         FROM NOTES n JOIN GROUP_TASK g ON g.group_id = n.group_id
         JOIN USERS u ON n.created_by = u.user_id 
@@ -260,7 +261,7 @@ export const get_notes = catchAsync( async(req , res) => {
         [user.user_id]
     );
 
-    const [rowsGroup] = await db.query(
+    const [rowsGroup] = await pool.query(
         `
         SELECT 
             group_id AS groupId,
@@ -285,10 +286,10 @@ export const add_notes = catchAsync( async(req , res) => {
 
     const groupId = req.params.groupId;
     const user = req.user;
-    const db = req.app.locals.db;
+    
     const {noteTypes , noteDetails , noteUrl} = req.body;
 
-    const [result] = await db.query(
+    const [result] = await pool.query(
         `
         INSERT INTO NOTES (group_id , note_types , note_details , created_by , created_at , notes_link)
         VALUES(? , ? , ?  ,? , ? , ?)
@@ -302,14 +303,14 @@ export const add_notes = catchAsync( async(req , res) => {
 
     const noteId = result.insertId;
 
-    const [rows] = await db.query(
+    const [rows] = await pool.query(
         `
         SELECT 
             g.group_name AS groupName , 
             n.note_types  AS types, 
             n.note_details AS details,
             n.notes_link AS notesLink,
-            u.user_name AS createdBy,
+            u.user_name AS createpooly,
             DATE_FORMAT(n.created_at, '%d %b %Y') AS createdAt
         FROM NOTES n JOIN GROUP_TASK g ON g.group_id = n.group_id
         JOIN USERS u ON n.created_by = u.user_id
@@ -329,12 +330,12 @@ export const add_notes = catchAsync( async(req , res) => {
 export const update_task = catchAsync( async(req , res) => {
 
 
-    const db = req.app.locals.db;
+    
     const taskId = req.params.taskId;
 
     const {status} = req.body;
 
-    const [result] = await db.query(
+    const [result] = await pool.query(
         `
         UPDATE TASK
         SET STATUS = ?
@@ -354,14 +355,14 @@ export const update_task = catchAsync( async(req , res) => {
 
 export const create_invite = catchAsync( async(req , res) => {
 
-    const db = req.app.locals.db;
+
 
     const groupId = req.params.groupId;
 
     const inviteToken = crypto.randomBytes(10).toString("hex"); 
     const expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); 
 
-    const [result] = await db.query(
+    const [result] = await pool.query(
         `
         INSERT INTO INVITES (group_id , invite_token , expires_at)
         VALUES(? , ? , ?)
@@ -382,11 +383,11 @@ export const create_invite = catchAsync( async(req , res) => {
 export const join_invite = catchAsync( async(req , res) => {
     
     const user = req.user;
-    const db = req.app.locals.db;
+    
 
     const {groupId , tokenId} = req.body;
 
-    const [rowsLink] = await db.query(
+    const [rowsLink] = await pool.query(
         `
         SELECT 
             CASE 
@@ -403,7 +404,7 @@ export const join_invite = catchAsync( async(req , res) => {
         throw new AppError("Invites Link is Expired" , 410);
     }
 
-    const [rowsMember] = await db.query(
+    const [rowsMember] = await pool.query(
         `
         SELECT *
         FROM MEMBERS
@@ -416,7 +417,7 @@ export const join_invite = catchAsync( async(req , res) => {
         throw new AppError("User is already in the group", 409);
     }
 
-    const [result] = await db.query(
+    const [result] = await pool.query(
         `
             INSERT INTO MEMBERS(group_id , user_id , joined_at)
             VALUES(? , ? , ?)
@@ -433,10 +434,10 @@ export const join_invite = catchAsync( async(req , res) => {
 
 export const send_invite = catchAsync( async(req , res) => {
 
-    const db = req.app.locals.db;
+    
     const {emails , groupId , link} = req.body;
 
-    const [rows] = await db.query(
+    const [rows] = await pool.query(
 
         `
         SELECT group_name AS groupName

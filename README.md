@@ -1,9 +1,9 @@
-# i-do
+# i-Do : Your Study Manager
 
 A monorepo containing a frontend and backend for the "i-do" project.
 
 > Short description
-> Replace this with a one- or two-sentence description of what "i-do" is and does (for example: "A to-do list web app with real-time collaboration" or "An appointment booking system for small teams").
+> i-do is a study management web app designed to help students organize tasks, collaborate in groups, and stay accountable. It allows users to manage assignments, track progress, and receive real-time notifications—making studying more structured, efficient, and stress-free.
 
 Table of contents
 - [Repository structure](#repository-structure)

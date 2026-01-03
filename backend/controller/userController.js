@@ -141,7 +141,7 @@ export const add_task = catchAsync( async (req , res) => {
 
             <p>
                 Check it out on your dashboard:
-                <a>
+                <a href="${process.env.FRONTEND_URL}/dashboard">
                     ${process.env.FRONTEND_URL}/dashboard
                 </a>
             <p>
@@ -220,7 +220,9 @@ export const create_group = catchAsync( async (req , res) => {
 
                     <p>
                         To accept the invitation, please click the link below:
-                        <a>${process.env.FRONTEND_URL}/join/${invite[0].groupId}/${invite[0].inviteToken}</a>
+                        <a href="${process.env.FRONTEND_URL}/join/${invite[0].groupId}/${invite[0].inviteToken}">
+                            ${process.env.FRONTEND_URL}/join/${invite[0].groupId}/${invite[0].inviteToken}
+                        </a>
                     </p>
                     `
             })
@@ -462,7 +464,9 @@ export const send_invite = catchAsync( async(req , res) => {
 
                 <p>
                     To accept the invitation, please click the link below:
-                    <a>${link}</a>
+                    <a href="${link}">
+                        ${link}
+                    </a>
                 </p>
                 `
         })

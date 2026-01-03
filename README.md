@@ -82,7 +82,7 @@ Create a `.env` in both `frontend/` and `backend/` as needed. Example placeholde
 
 frontend/.env
 ```
-VITE_BACKEND_API=http://localhost:4000
+VITE_BACKEND_API=http://localhost:5000
 ```
 
 backend/.env

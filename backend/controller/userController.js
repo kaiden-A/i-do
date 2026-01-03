@@ -137,7 +137,7 @@ export const add_task = catchAsync( async (req , res) => {
             <h2>Hi ${rowsUser[0].userName},</h2>
 
             <p>You've been assigned a new task in "${rowsUser[0].groupName}":
-            "${title}</p>"
+            "${title}"</p>
 
             <p>
                 Check it out on your dashboard:
@@ -210,7 +210,7 @@ export const create_group = catchAsync( async (req , res) => {
             [inviteId]
         );
 
-        await Promise.all(emails.map(email =>
+        for(const email of emails){
             sendEmail({
                 to: email,
                 subject: "Group invitation",
@@ -226,7 +226,8 @@ export const create_group = catchAsync( async (req , res) => {
                     </p>
                     `
             })
-        ));
+        }
+        
 
 
 
@@ -454,23 +455,20 @@ export const send_invite = catchAsync( async(req , res) => {
         `,
         [groupId]
     )
-    await Promise.all(emails.map(email =>
-        sendEmail({
+
+    for (const email of emails) {
+        await sendEmail({
             to: email,
             subject: "Group invitation",
-            html: 
-                `
+            html: `
                 <p>You have been invited to join the group "${rows[0].groupName}".</p>
-
                 <p>
                     To accept the invitation, please click the link below:
-                    <a href="${link}">
-                        ${link}
-                    </a>
+                    <a href="${link}">${link}</a>
                 </p>
-                `
-        })
-    ));
+            `
+        });
+    }
 
     res.status(200).json({success : true , message : "Successfully Sends Emails"})
 })

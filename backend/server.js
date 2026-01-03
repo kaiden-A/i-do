@@ -22,7 +22,7 @@ app.use(cors({
 const PORT = process.env.PORT || 5000;
 
 app.get('/' , (req , res) => {
-    console.log('opening website')
+  res.json({message : "Opening website"})
 })
 
 app.get("/test-email", async (req, res) => {

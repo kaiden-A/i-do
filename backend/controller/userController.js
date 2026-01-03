@@ -132,15 +132,19 @@ export const add_task = catchAsync( async (req , res) => {
     await sendEmail({
         to : rowsUser[0].email,
         subject : "You Have Been Assigned a Task",
-        text : 
+        html : 
             `
-            Hi ${rowsUser[0].userName},
+            <h2>Hi ${rowsUser[0].userName},</h2>
 
-            You've been assigned a new task in "${rowsUser[0].groupName}":
-            "${title}"
+            <p>You've been assigned a new task in "${rowsUser[0].groupName}":
+            "${title}</p>"
 
-            Check it out on your dashboard:
-            ${process.env.FRONTEND_URL}/dashboard
+            <p>
+                Check it out on your dashboard:
+                <a>
+                    ${process.env.FRONTEND_URL}/dashboard
+                </a>
+            <p>
             `
     })
 
@@ -210,12 +214,14 @@ export const create_group = catchAsync( async (req , res) => {
             sendEmail({
                 to: email,
                 subject: "Group invitation",
-                text: 
+                html: 
                     `
-                    You have been invited to join the group "${groupName}".
+                    <p>You have been invited to join the group "${groupName}".</p>
 
-                    To accept the invitation, please click the link below:
-                    ${process.env.FRONTEND_URL}/join/${invite[0].groupId}/${invite[0].inviteToken}
+                    <p>
+                        To accept the invitation, please click the link below:
+                        <a>${process.env.FRONTEND_URL}/join/${invite[0].groupId}/${invite[0].inviteToken}</a>
+                    </p>
                     `
             })
         ));
@@ -450,12 +456,14 @@ export const send_invite = catchAsync( async(req , res) => {
         sendEmail({
             to: email,
             subject: "Group invitation",
-            text: 
+            html: 
                 `
-                You have been invited to join the group "${rows[0].groupName}".
+                <p>You have been invited to join the group "${rows[0].groupName}".</p>
 
-                To accept the invitation, please click the link below:
-                ${link}
+                <p>
+                    To accept the invitation, please click the link below:
+                    <a>${link}</a>
+                </p>
                 `
         })
     ));

@@ -2,7 +2,6 @@ import '../config/env.js';
 
 import mysql from "mysql2/promise";
 import fs from "fs";
-console.log(process.env.DB_SSL_CERT);
 
 const pool = mysql.createPool({
   host: process.env.MYSQL_HOST,

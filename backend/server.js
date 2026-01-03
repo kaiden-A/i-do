@@ -5,7 +5,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 import authRoutes from './routes/authRoutes.js'
 import errorHandler from './middleware/errorHandler.js';
-
+import sendEmail from './utils/sendEmail.js';
 
 const app = express();
 
@@ -24,6 +24,16 @@ const PORT = process.env.PORT || 5000;
 app.get('/' , (req , res) => {
     console.log('opening website')
 })
+
+app.get("/test-email", async (req, res) => {
+  await sendEmail({
+    to: "amirikhwanfaisal@gmail.com",
+    subject: "Brevo test",
+    html: "<p>Brevo SMTP works 🎉</p>"
+  });
+
+  res.json({msg : "Email sent"});
+});
 
 app.use('/api' ,  authRoutes);
 app.use(errorHandler);

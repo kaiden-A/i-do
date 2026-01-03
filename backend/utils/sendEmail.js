@@ -1,34 +1,23 @@
-import nodemailer from 'nodemailer';
+import SibApiV3Sdk from "sib-api-v3-sdk";
 
-async function sendEmail({ to, subject, text }) {
-    if (!to || (Array.isArray(to) && to.length === 0) || to.trim?.() === '') {
-        console.log('No recipient provided. Skipping email.');
-        return;
-    }
+const client = SibApiV3Sdk.ApiClient.instance;
+client.authentications["api-key"].apiKey = process.env.BREVO_API_KEY;
 
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
+const emailApi = new SibApiV3Sdk.TransactionalEmailsApi();
+
+export async function sendEmail({ to, subject, html }) {
+  try {
+    const response = await emailApi.sendTransacEmail({
+      sender: { email: "amirikhwanfaisal@gmail.com", name: "i-Do : Your Study Manager" },
+      to: [{ email: to }],
+      subject,
+      htmlContent: html,
     });
-
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: to, // string or array
-        subject,
-        text,
-    };
-
-    try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log('Email sent:', info.response);
-    } catch (error) {
-        console.error('Error sending email:', error);
-    }
+    console.log("✅ Email sent:", response.messageId);
+  } catch (err) {
+    console.error("❌ Email error:", err);
+    throw err;
+  }
 }
 
 export default sendEmail;

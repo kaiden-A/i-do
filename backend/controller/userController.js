@@ -394,7 +394,7 @@ export const join_invite = catchAsync( async(req , res) => {
                 WHEN expires_at < NOW() THEN 'EXPIRED'
                 ELSE 'VALID'
             END AS tokenStatus
-        FROM invites
+        FROM INVITES
         WHERE invite_token = ?
         `,
         [tokenId]

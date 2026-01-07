@@ -9,10 +9,13 @@ function CreateTask({onClose , members , groupId , onSuccess}){
     const [due , setDue] = useState("");
     const [userId , setUserId] = useState("");
 
+    const [submit , setSubmit] = useState(false);
+
 
     const sendForm = async (e) => {
 
         e.preventDefault();
+        setSubmit(true);
 
         try{
 
@@ -28,6 +31,8 @@ function CreateTask({onClose , members , groupId , onSuccess}){
 
         }catch(err){
             console.error(err.responses.data.message || err.message)
+        }finally{
+            setSubmit(false);
         }
     }
 
@@ -90,7 +95,14 @@ function CreateTask({onClose , members , groupId , onSuccess}){
                     </div>
                     <div className="form-actions">
                         <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
-                        <button type="submit" className="btn btn-primary">Add Task</button>
+                        <button 
+                            type="submit" 
+                            disabled={submit} 
+                            className="btn btn-primary"
+                            style={{backgroundColor : submit ? "#7d8bfc"  : "#5d6afb" , cursor: submit ? "not-allowed" : "pointer"}}
+                        >
+                            {`${submit ? "Submitting task..." : "Add Task"}`}
+                        </button>
                     </div>
                 </form>
             </div>

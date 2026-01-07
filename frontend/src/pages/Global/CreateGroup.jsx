@@ -9,15 +9,16 @@ function CreateGroup({onClose}){
     const [name , setName] = useState("");
     const [desc , setDesc] = useState("");
     const [email , setEmail] = useState("");
+    const [isSubmit , setIsSubmit] = useState(false);
 
     const {setData} = useContext(DashboardContext);
+
 
     const location = useLocation();
     const navigate = useNavigate();
     
 
     const sendForm = async (e) => {
-
 
         e.preventDefault();
         const emails = email
@@ -26,7 +27,8 @@ function CreateGroup({onClose}){
             .filter(e => e && e.includes('@')); // only keep valid emails
 
 
-        console.log(emails);
+        setIsSubmit(true);
+
         try{
 
             const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/groups` , 
@@ -47,6 +49,8 @@ function CreateGroup({onClose}){
 
         }catch(err){
             console.log(err);
+        }finally{
+            setIsSubmit(false);
         }
 
     }
@@ -97,7 +101,15 @@ function CreateGroup({onClose}){
                         </div>
                         <div className="form-actions">
                             <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
-                            <button type="submit" className="btn btn-primary">Create Study Group</button>
+                            <button 
+                                type="submit" 
+                                disabled={isSubmit} 
+                                className="btn btn-primary"
+                                style={{backgroundColor : isSubmit ? "#7d8bfc"  : "#5d6afb" , cursor: isSubmit ? "not-allowed" : "pointer"}}
+                                
+                            >
+                                {` ${isSubmit ? "Register The Group..." : "Create Study Group"}`}
+                            </button>
                         </div>
                     </form>
                 </div>

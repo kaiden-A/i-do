@@ -11,6 +11,7 @@ function AddMembers({onClose , groupId}){
     const [send , setSend] = useState(false);
 
     const [email , setEmail] = useState("");
+    const [submit , setSubmit] = useState(false);
 
     useEffect(() => {
 
@@ -42,6 +43,7 @@ function AddMembers({onClose , groupId}){
 
         if(!link) return;
 
+        setSubmit(true);
         try{
 
             const emails = email
@@ -58,19 +60,12 @@ function AddMembers({onClose , groupId}){
                 setMsg(res.data.message);
                 setSend(true);
             }
- 
-
-
-
-
-
-
-
-
 
             
         }catch(err){
             console.error(err.response?.data?.message || err.message);
+        }finally{
+            setSubmit(false);
         }
 
     }
@@ -137,7 +132,14 @@ function AddMembers({onClose , groupId}){
                         </div>
                         <div className="form-actions">
                             <button type="button" className="btn btn-secondary" onClick={onClose}>Close</button>
-                            <button type="submit" className="btn btn-success">Send Invites</button>
+                            <button
+                                type="submit" 
+                                disabled={submit} 
+                                className="btn btn-primary"
+                                style={{backgroundColor : submit ? "#2ce0cf"  : "#00c9b7" , cursor: submit ? "not-allowed" : "pointer"}}
+                            >
+                                {`${submit ? "Sending Invitation...": "Send Invites"}`}
+                            </button>
                         </div>
                     </form>
                 </div>

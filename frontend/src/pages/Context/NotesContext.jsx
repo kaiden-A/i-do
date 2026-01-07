@@ -19,13 +19,11 @@ export function NotesProvider({children}){
                     {withCredentials : true}
                 )
 
-                console.log(res.data);
-
                 setNotes(res.data.notes);
                 setGroups(res.data.groups);
 
             }catch(err){
-                console.log(err);
+               console.error(err.response?.data || err.message);
                 throw new Error(err);
             }
 

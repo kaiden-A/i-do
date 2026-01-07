@@ -9,13 +9,14 @@ function ChangeStatus({title , onClose , taskId}){
     const [status , setStatus] = useState("");
     const [msg , setMsg] = useState("");
     const [noti , setNoti] = useState(false);
+    const [submit , setSubmit] = useState(false);
 
     const {setData} = useContext(TaskContext);
 
     const sendForm = async (e) => {
 
         e.preventDefault();
-
+        setSubmit(true);
         try{
 
             const res = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/tasks/${Number(taskId)}`,
@@ -57,6 +58,8 @@ function ChangeStatus({title , onClose , taskId}){
 
         }catch(err){
             console.error(err.responses?.data.message || err.message)
+        }finally{
+            setSubmit(false);
         }
     }
 
@@ -92,7 +95,14 @@ function ChangeStatus({title , onClose , taskId}){
                         </div>
                         <div className="form-actions">
                             <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
-                            <button type="submit" className="btn btn-success">Change Status</button>
+                            <button 
+                                type="submit" 
+                                disabled={submit} 
+                                className="btn btn-primary"
+                                style={{backgroundColor : submit ? "#2ce0cf"  : "#00c9b7" , cursor: submit ? "not-allowed" : "pointer"}}
+                            >
+                                {`${submit ? "Changing Status..." : "Change Status"}`}
+                            </button>
                         </div>
                     </form>
                 </div>

@@ -261,7 +261,7 @@ export const get_notes = catchAsync( async(req , res) => {
             n.note_types  AS types, 
             n.note_details AS details,
             n.notes_link AS notesLink,
-            u.user_name AS createpooly,
+            u.user_name AS createdBy,
             DATE_FORMAT(n.created_at, '%d %b %Y') AS createdAt
         FROM NOTES n JOIN GROUP_TASK g ON g.group_id = n.group_id
         JOIN USERS u ON n.created_by = u.user_id 
@@ -319,7 +319,7 @@ export const add_notes = catchAsync( async(req , res) => {
             n.note_types  AS types, 
             n.note_details AS details,
             n.notes_link AS notesLink,
-            u.user_name AS createpooly,
+            u.user_name AS createdBy,
             DATE_FORMAT(n.created_at, '%d %b %Y') AS createdAt
         FROM NOTES n JOIN GROUP_TASK g ON g.group_id = n.group_id
         JOIN USERS u ON n.created_by = u.user_id
@@ -396,7 +396,7 @@ export const join_invite = catchAsync( async(req , res) => {
 
     const {groupId , tokenId} = req.body;
 
-    const [rowsLink] = await pool.query(
+    const [rowsLink] = await pool.query( 
         `
         SELECT 
             CASE 

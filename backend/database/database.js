@@ -13,11 +13,10 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
 
-  
 
-  ssl: {
-    ca: fs.readFileSync(process.env.DB_SSL_CERT)
-  }
+  // ssl: {
+  //   ca: fs.readFileSync(process.env.DB_SSL_CERT)
+  // }
 });
 
 console.log("Connected To Databases");

@@ -1,0 +1,110 @@
+cells:
+  - kind: 2
+    value: "create or replace procedure viewUserNotes (p_user_id users.user_id%type)
+      is\r
+
+      \    cursor c_notes is\r
+
+      \        select\r
+
+      \            g.group_name,\r
+
+      \            n.note_details,\r
+
+      \            u.user_name as created_by_name,\r
+
+      \            n.note_id\r
+
+      \        from notes n\r
+
+      \        join groups g on n.group_id = g.group_id\r
+
+      \        join users u on n.created_by = u.user_id\r
+
+      \        where n.group_id in (\r
+
+      \            select m.group_id\r
+
+      \            from members m\r
+
+      \            where m.user_id = p_user_id\r
+
+      \        )\r
+
+      \        order by n.note_id;\r
+
+      \r
+
+      begin\r
+
+      \    for rec in c_notes loop\r
+
+      \        dbms_output.put_line(\r
+
+      \            'Group: ' || rec.group_name ||\r
+
+      \            ' | Details: ' || rec.note_details ||\r
+
+      \            ' | By: ' || rec.created_by_name ||\r
+
+      \            ' | Note ID: ' || rec.note_id\r
+
+      \        );\r
+
+      \    end loop;\r
+
+      end viewUserNotes;\r
+
+      /\r
+
+      \r
+
+      set serveroutput on\r
+
+      begin\r
+
+      \    viewUserNotes('u001');\r
+
+      end;\r
+
+      /\r
+
+      \r
+
+      \r\n"
+    languageId: oracle-sql
+  - kind: 2
+    value: "SELECT  \r
+
+      \    u.user_name, \r
+
+      \    g.group_name, \r
+
+      \    t.title AS task_title, \r
+
+      \    t.description AS \r
+
+      \    task_description, \r
+
+      \    t.status AS task_status, \r
+
+      \    TO_CHAR(t.due_date, 'MON/DD/YYYY') AS task_due_date \r
+
+      FROM users u \r
+
+      JOIN groups g ON g.group_id IN \r
+
+      ( SELECT \r
+
+      \    m.group_id \r
+
+      \    FROM members m \r
+
+      \    WHERE m.user_id = u.user_id )\r
+
+      LEFT JOIN tasks t ON t.group_id = g.group_id\r
+
+      WHERE u.user_id = '&user_id' \r
+
+      ORDER BY t.due_date;\r\n"
+    languageId: oracle-sql
